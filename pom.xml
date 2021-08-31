@@ -16,7 +16,7 @@
         <hive.version>2.3.8</hive.version>
 <!--        <hive.version>2.1.1-cdh6.2.1</hive.version>-->
         <iceberg.version>0.11.1</iceberg.version>
-        <debezium.version>1.5.3.Final</debezium.version>
+        <debezium.version>1.4.1.Final</debezium.version>
         <hadoop.version>2.7.3</hadoop.version>
         <flink.version>1.11.1</flink.version>
         <scala.binary.version>2.12</scala.binary.version>
@@ -83,14 +83,14 @@
         <dependency>
             <groupId>com.alibaba.ververica</groupId>
             <artifactId>flink-connector-mysql-cdc</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
 
         <dependency>
             <groupId>io.debezium</groupId>
             <artifactId>debezium-api</artifactId>
             <version>${debezium.version}</version>
-        </dependency>r
+        </dependency>
 
         <dependency>
             <groupId>io.debezium</groupId>
@@ -101,6 +101,12 @@
         <dependency>
             <groupId>io.debezium</groupId>
             <artifactId>debezium-connector-mysql</artifactId>
+            <version>${debezium.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.debezium</groupId>
+            <artifactId>debezium-connector-sqlserver</artifactId>
             <version>${debezium.version}</version>
         </dependency>
 
@@ -170,9 +176,9 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>2.0.0-alpha1</version>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.8</version>
         </dependency>
     </dependencies>
 </project>

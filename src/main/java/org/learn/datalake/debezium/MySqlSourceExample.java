@@ -21,7 +21,7 @@ import org.apache.iceberg.*;
 import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.sink.FlinkSink;
 import org.junit.rules.TemporaryFolder;
-import org.learn.datalake.common.MysqlConfig;
+import org.learn.datalake.common.DBConfig;
 import org.learn.datalake.common.SimpleDataUtil;
 
 import java.io.File;
@@ -73,11 +73,11 @@ public class MySqlSourceExample {
          * where the connector only snapshots the schemas (not the data).
          */
         SourceFunction<RowData> sourceFunction = MySQLSource.<RowData>builder()
-                .hostname(MysqlConfig.host)
-                .port(MysqlConfig.port)
-                .databaseList(MysqlConfig.dbName)
-                .username(MysqlConfig.userName)
-                .password(MysqlConfig.passWd)
+                .hostname(DBConfig.MYSQLJKDB.host)
+                .port(DBConfig.MYSQLJKDB.port)
+                .databaseList(DBConfig.MYSQLJKDB.dbName)
+                .username(DBConfig.MYSQLJKDB.userName)
+                .password(DBConfig.MYSQLJKDB.passWd)
                 .deserializer(deserialer)
 //                .deserializer(new StringDebeziumDeserializationSchema()) // converts SourceRecord to String
                 .build();

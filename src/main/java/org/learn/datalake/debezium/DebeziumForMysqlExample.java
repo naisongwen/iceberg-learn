@@ -2,27 +2,32 @@ package org.learn.datalake.debezium;
 
 import io.debezium.config.Configuration;
 import io.debezium.connector.mysql.MySqlConnector;
+import io.debezium.connector.sqlserver.SqlServerConnector;
 import io.debezium.data.Envelope;
 import io.debezium.embedded.EmbeddedEngine;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.format.Json;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.flink.util.ExceptionUtils;
 import org.apache.kafka.connect.data.Field;
 import org.apache.kafka.connect.data.Struct;
 import org.apache.kafka.connect.source.SourceRecord;
-import org.learn.datalake.common.MysqlConfig;
+import org.learn.datalake.common.DBConfig;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static io.debezium.data.Envelope.FieldName.*;
 import static java.util.stream.Collectors.toMap;
 
-public class DebeziumExample {
+@Slf4j
+public class DebeziumForMysqlExample {
     Configuration connectorConfiguration() {
         return io.debezium.config.Configuration.create()
                 .with("connector.class", MySqlConnector.class.getName())
@@ -32,19 +37,17 @@ public class DebeziumExample {
                 .with("name", "mysql-connector")
                 //是否包含数据库表结构层面的变更，建议使用默认值true
                 .with("include.schema.changes", "false")
-                // unique within all processes that make up the MySQL server group and is any integer between 1 and 232-1
-                //.with("database.server.id", "85744")
                 //MySQL 服务器或集群的逻辑名称
                 .with("database.server.name", "mysql_binlog_source")
-                .with("database.hostname", MysqlConfig.host)
-                .with("database.port", MysqlConfig.port)
-                .with("database.user", MysqlConfig.userName)
-                .with("database.password", MysqlConfig.passWd)
-                .with("database.dbname", MysqlConfig.dbName)
-                .with("database.include.list", MysqlConfig.dbName)
-                //.with("table.include.list", MysqlConfig.tableName)
+                .with("database.hostname", DBConfig.MYSQLJKDB.host)
+                .with("database.port", DBConfig.MYSQLJKDB.port)
+                .with("database.user", DBConfig.MYSQLJKDB.userName)
+                .with("database.password", DBConfig.MYSQLJKDB.passWd)
+                .with("database.dbname", DBConfig.MYSQLJKDB.dbName)
+                .with("database.include.list", DBConfig.MYSQLJKDB.dbName)
+                .with("table.include.list", DBConfig.MYSQLJKDB.tableName)
                 //历史变更记录
-                .with("database.history", "io.org.learn.datalake.debezium.relational.history.MemoryDatabaseHistory")
+                .with("database.history", "io.debezium.relational.history.MemoryDatabaseHistory")
                 //历史变更记录存储位置
                 .with("database.history.file.filename", "")
                 .build();
@@ -67,6 +70,30 @@ public class DebeziumExample {
 
                 System.out.println(payload);
             }
+        }
+    }
+
+    private void shutdownHook(DebeziumEngine<?> engine) {
+        Runtime.getRuntime()
+                .addShutdownHook(
+                        new Thread(
+                                () -> {
+                                    log.info("Requesting embedded engine to shut down");
+                                    try {
+                                        engine.close();
+                                    } catch (IOException e) {
+                                        ExceptionUtils.rethrow(e);
+                                    }
+                                }));
+    }
+
+    private void awaitTermination(ExecutorService executor) {
+        try {
+            while (!executor.awaitTermination(10L, TimeUnit.SECONDS)) {
+                log.info("Waiting another 10 seconds for the embedded engine to shut down");
+            }
+        } catch (InterruptedException e) {
+            Thread.interrupted();
         }
     }
 
@@ -93,19 +120,22 @@ public class DebeziumExample {
         // Engine is stopped when the main code is finished when warped by try()
         DebeziumEngine<ChangeEvent<String, String>> engine = DebeziumEngine.create(Json.class)
                 .using(conf.asProperties())
-                .notifying(new JsonChangeConsumer()).build();
-//                .notifying(record -> {
-//                    System.out.println(record);
-//                }).build();
+                .notifying(record -> {
+                    System.out.println(record);
+                }).build();
         {
             // Run the engine asynchronously ...
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(engine);
+
+            shutdownHook(engine);
+
+            awaitTermination(executor);
         }
     }
 
     public static void main(String args[]) throws InterruptedException, IOException {
-        DebeziumExample debeziumExample = new DebeziumExample();
+        DebeziumForMysqlExample debeziumExample = new DebeziumForMysqlExample();
         debeziumExample.start();
     }
 

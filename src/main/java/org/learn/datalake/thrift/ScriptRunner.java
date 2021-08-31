@@ -19,7 +19,7 @@
  *  and a constructor.
  */
 
-package org.learn.datalake.common;
+package org.learn.datalake.thrift;
 
 import java.io.IOException;
 import java.io.LineNumberReader;

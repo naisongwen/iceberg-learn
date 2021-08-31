@@ -17,7 +17,6 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportFactory;
-import org.learn.datalake.common.ScriptRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
