@@ -33,8 +33,8 @@ public class DataRowSinkExampleV2 extends ExampleBase {
     public static void main(String[] args) throws Exception {
         TableSchema schema =
                 TableSchema.builder()
-                        .add(TableColumn.of("id", DataTypes.INT()))
-                        .add(TableColumn.of("data", DataTypes.STRING()))
+                        .field("id", DataTypes.INT())
+                        .field("data", DataTypes.STRING())
                         .build();
 
 

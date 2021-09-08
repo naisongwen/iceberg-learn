@@ -43,11 +43,11 @@
         <name>datanucleus.schema.autoCreateAll</name>
         <value>true</value>
     </property>
-    <property>
-        <name>hive.metastore.warehouse.dir</name>
-        <value>file:/C:/Users/wns/Documents/workplace/datalake-learn/warehouse</value>
-        <description>location of default database for the warehouse</description>
-    </property>
+<!--    <property>-->
+<!--        <name>hive.metastore.warehouse.dir</name>-->
+<!--        <value>file:/C:/Users/wns/Documents/workplace/datalake-learn/warehouse</value>-->
+<!--        <description>location of default database for the warehouse</description>-->
+<!--    </property>-->
 
     <property>
         <name>hive.server2.enable.doAs</name>

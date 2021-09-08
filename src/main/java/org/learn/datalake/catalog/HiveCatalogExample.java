@@ -1,6 +1,6 @@
 package org.learn.datalake.catalog;
 
-import jodd.util.PropertiesUtil;
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -18,16 +18,13 @@ import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.types.Types;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
-import org.learn.datalake.thrift.HiveMetaStoreServer;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 import static org.apache.iceberg.PartitionSpec.builderFor;
@@ -36,18 +33,15 @@ import static org.apache.iceberg.types.Types.NestedField.required;
 
 public class HiveCatalogExample {
     protected static final String DB_NAME = "hivedb";
-    static final String TABLE_NAME =  "tbl";
+    static final String TABLE_NAME = "tbl";
 
     static final Schema schema = new Schema(Types.StructType.of(
             required(1, "id", Types.LongType.get())).fields());
     static final Schema altered = new Schema(Types.StructType.of(
             required(1, "id", Types.LongType.get()),
             optional(2, "data", Types.LongType.get())).fields());
-
-    private static final PartitionSpec partitionSpec = builderFor(schema).identity("id").build();
-
     static final TableIdentifier TABLE_IDENTIFIER = TableIdentifier.of(DB_NAME, TABLE_NAME);
-
+    private static final PartitionSpec partitionSpec = builderFor(schema).identity("id").build();
     public static TemporaryFolder tempFolder = new TemporaryFolder();
     protected static HiveMetaStoreClient metastoreClient;
     protected static HiveConf hiveConf;
@@ -75,16 +69,18 @@ public class HiveCatalogExample {
 
     //如果修改登录账户名称，设置环境变量：HADOOP_USER_NAME=hdfs
     public static void main(String[] args) throws Exception {
-        hiveConf=new HiveConf(new Configuration(), HiveCatalogExample.class);
-        Properties properties=new Properties();
-        PropertiesUtil.loadFromFile(properties,new File("hive.properties"));
-        String hiveLocalDir=properties.getProperty(HiveConf.ConfVars.METASTOREWAREHOUSE.varname);
-        hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, properties.getProperty(HiveConf.ConfVars.METASTOREURIS.varname));
-        hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname,hiveLocalDir );
+        hiveConf = new HiveConf(new Configuration(), HiveCatalogExample.class);
+        hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, "thrift://localhost:" + 58883);
+        // in Hive3, setting this as a system prop ensures that it will be picked up whenever a new HiveConf is created
+        File warehouse = new File("warehouse");
+        if (warehouse.exists())
+            FileUtils.deleteDirectory(warehouse);
+        String hiveLocalDir = warehouse.getAbsolutePath();
+        hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "file:" + hiveLocalDir);
         catalog = new HiveCatalog(hiveConf);
         metastoreClient = new HiveMetaStoreClient(hiveConf);
 
-        String dbPath=new File(hiveLocalDir, DB_NAME + ".db").getPath();
+        String dbPath = new File(hiveLocalDir, DB_NAME + ".db").getPath();
         Database db = new Database(DB_NAME, "description", dbPath, new HashMap<>());
         //metastoreClient.dropDatabase(db.getName());
         //metastoreClient.createDatabase(db);

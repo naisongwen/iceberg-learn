@@ -8,13 +8,13 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.data.RowData;
-import org.apache.flink.table.runtime.typeutils.RowDataTypeInfo;
 import org.apache.flink.types.Row;
 import org.apache.iceberg.*;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.sink.FlinkSink;
+import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.io.CloseableIterable;
 import org.junit.rules.TemporaryFolder;
 import org.learn.datalake.common.ExampleBase;
@@ -51,7 +51,7 @@ public class DataRowSinkExampleV3 extends ExampleBase {
                 row("+I", 1, "aaa"),
                 row("-D", 1, "aaa"),
                 row("+I", 3, "ccc")), ROW_TYPE_INFO)
-                .map(CONVERTER::toInternal, RowDataTypeInfo.of(SimpleDataUtil.ROW_TYPE));
+                .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(SimpleDataUtil.ROW_TYPE));
 
 //        DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
 //                Row.of(RowKind.INSERT,1, "hello"),

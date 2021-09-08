@@ -41,10 +41,11 @@ public class MySqlSourceExample {
     public static void main(String[] args) throws Exception {
         TableSchema schema =
                 TableSchema.builder()
-                        .add(TableColumn.of("id", DataTypes.INT()))
-                        .add(TableColumn.of("key", DataTypes.STRING()))
-                        .add(TableColumn.of("value", DataTypes.STRING()))
+                        .field("id", DataTypes.INT())
+                        .field("key", DataTypes.STRING())
+                        .field("value", DataTypes.STRING())
                         .build();
+
         RowType rowType = (RowType) schema.toRowDataType().getLogicalType();
         DataType internalDataType = DataTypeUtils.transform(
                 schema.toRowDataType(),

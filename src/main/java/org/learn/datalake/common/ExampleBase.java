@@ -7,7 +7,6 @@ import org.apache.flink.table.data.util.DataFormatConverters;
 import org.apache.flink.types.Row;
 import org.apache.flink.types.RowKind;
 import org.apache.flink.util.CloseableIterator;
-import org.apache.iceberg.flink.FlinkTableOptions;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 
 import java.util.List;
@@ -48,7 +47,6 @@ public abstract class ExampleBase {
                             .build();
 
                     TableEnvironment env = TableEnvironment.create(settings);
-                    env.getConfig().getConfiguration().set(FlinkTableOptions.TABLE_EXEC_ICEBERG_INFER_SOURCE_PARALLELISM, false);
                     tEnv = env;
                 }
             }
@@ -69,7 +67,7 @@ public abstract class ExampleBase {
 
         tableResult.getJobClient().ifPresent(c -> {
             try {
-                c.getJobExecutionResult(Thread.currentThread().getContextClassLoader()).get();
+                c.getJobExecutionResult().get();
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
             }

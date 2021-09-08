@@ -5,7 +5,6 @@ import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
-import org.apache.iceberg.exceptions.NoSuchNamespaceException;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
@@ -30,7 +29,7 @@ public class HadoopCatalogExample {
         TemporaryFolder temp = new TemporaryFolder();
         temp.create();
         String warehousePath = temp.newFolder().getAbsolutePath();
-        System.out.println("warehousePath:"+warehousePath);
+        System.out.println("warehousePath:" + warehousePath);
         HadoopCatalog catalog = new HadoopCatalog(conf, warehousePath);
 
         TableIdentifier tbl1 = TableIdentifier.of("db", "tbl1");

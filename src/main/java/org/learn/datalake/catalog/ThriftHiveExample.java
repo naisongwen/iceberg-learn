@@ -1,4 +1,4 @@
-package org.learn.datalake.thrift;
+package org.learn.datalake.catalog;
 
 import org.apache.iceberg.CatalogProperties;
 import org.apache.iceberg.flink.FlinkCatalogFactory;
@@ -11,7 +11,7 @@ import java.util.Map;
 public class ThriftHiveExample extends ExampleBase {
 
     private static final String THRIFT_URI = "thrift://hw-node5:9083";
-//    private static final String THRIFT_URI = "thrift://localhost:50938";
+    //    private static final String THRIFT_URI = "thrift://localhost:50938";
 
     static String toWithClause(Map<String, String> props) {
         StringBuilder builder = new StringBuilder();
