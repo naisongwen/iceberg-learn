@@ -3,6 +3,7 @@ package org.learn.datalake.iceberg;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -17,14 +18,16 @@ import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.io.CloseableIterable;
 import org.junit.rules.TemporaryFolder;
+import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
-import org.learn.datalake.common.BoundedTestSource;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+
+import static org.learn.datalake.metadata.TableTestBase.getTableOrCreate;
 
 //https://github.com/ververica/flink-cdc-connectors
 
@@ -48,9 +51,9 @@ public class DataRowSinkExampleV3 extends ExampleBase {
                 SimpleDataUtil.FLINK_SCHEMA.getFieldTypes());
 
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
-                row("+I", 1, "aaa"),
-                row("-D", 1, "aaa"),
-                row("+I", 3, "ccc")), ROW_TYPE_INFO)
+                        row("+I", 1, "aaa"),
+                        row("-D", 1, "aaa")
+                ), ROW_TYPE_INFO)
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(SimpleDataUtil.ROW_TYPE));
 
 //        DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
@@ -60,25 +63,15 @@ public class DataRowSinkExampleV3 extends ExampleBase {
 //                .map(CONVERTER::toInternal, RowDataTypeInfo.of(SimpleDataUtil.ROW_TYPE));
 
 
-        TemporaryFolder TEMPORARY_FOLDER = new TemporaryFolder(new File("target"));
-        TEMPORARY_FOLDER.create();
-        File folder = TEMPORARY_FOLDER.newFolder();
-        String warehouse = folder.getAbsolutePath();
-        String tablePath = warehouse.concat("/test");
+        File warehouse = new File("warehouse/test_upsert_file_V3");
+        Table table = getTableOrCreate(warehouse,true);
 
-        //dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(ROW_ID_POS));
-        // need to upgrade version to 2,otherwise 'java.lang.IllegalArgumentException: Cannot write
-        // delete files in a v1 table'
-
-        FileFormat format=FileFormat.valueOf("avro".toUpperCase(Locale.ENGLISH));
-        Map<String, String> props = ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, format.name());
-        Table table = SimpleDataUtil.createTable(tablePath, props, false);
-
+        dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));
         TableOperations operations = ((BaseTable) table).operations();
         TableMetadata metadata = operations.current();
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));
 
-        TableLoader tableLoader = TableLoader.fromHadoopTable(tablePath);
+        TableLoader tableLoader = TableLoader.fromHadoopTable(warehouse.getAbsolutePath());
         FlinkSink.forRowData(dataStream)
                 .table(table)
                 .tableLoader(tableLoader)
@@ -98,12 +91,6 @@ public class DataRowSinkExampleV3 extends ExampleBase {
                     .build()) {
                 reader.forEach(System.out::print);
             }
-        }
-
-        System.out.println();
-        try (CloseableIterable<Record> iterable = IcebergGenerics.read(table).build()){
-            String data=Iterables.toString(iterable);
-            System.out.println(data);
         }
     }
 }

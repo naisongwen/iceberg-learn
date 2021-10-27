@@ -23,13 +23,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.flink.runtime.state.CheckpointListener;
-import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
+import org.apache.flink.api.common.state.CheckpointListener;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 /**
- * A stream org.learn.datalake.source that:
+ * A stream source that:
  * 1) emits the elements from elementsPerCheckpoint.get(0) without allowing checkpoints.
  * 2) then waits for the checkpoint to complete.
  * 3) emits the elements from elementsPerCheckpoint.get(1) without allowing checkpoints.
@@ -38,7 +36,7 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction;
  *
  * <p>Util all the list from elementsPerCheckpoint are exhausted.
  */
-public final class BoundedTestSource<T> extends RichSourceFunction<T> implements SourceFunction<T>,CheckpointListener {
+public final class BoundedTestSource<T> implements SourceFunction<T>, CheckpointListener {
 
     private final List<List<T>> elementsPerCheckpoint;
     private volatile boolean running = true;
@@ -61,24 +59,28 @@ public final class BoundedTestSource<T> extends RichSourceFunction<T> implements
 
     @Override
     public void run(SourceContext<T> ctx) throws Exception {
-
         for (int checkpoint = 0; checkpoint < elementsPerCheckpoint.size(); checkpoint++) {
 
             final int checkpointToAwait;
             synchronized (ctx.getCheckpointLock()) {
+                // Let's say checkpointToAwait = numCheckpointsComplete.get() + delta, in fact the value of delta should not
+                // affect the final table records because we only need to make sure that there will be exactly
+                // elementsPerCheckpoint.size() checkpoints to emit each records buffer from the original elementsPerCheckpoint.
+                // Even if the checkpoints that emitted results are not continuous, the correctness of the data should not be
+                // affected in the end. Setting the delta to be 2 is introducing the variable that produce un-continuous
+                // checkpoints that emit the records buffer from elementsPerCheckpoints.
                 checkpointToAwait = numCheckpointsComplete.get() + 2;
                 for (T element : elementsPerCheckpoint.get(checkpoint)) {
                     ctx.collect(element);
                 }
             }
+
+            synchronized (ctx.getCheckpointLock()) {
+                while (running && numCheckpointsComplete.get() < checkpointToAwait) {
+                    ctx.getCheckpointLock().wait(1);
+                }
+            }
         }
-
-//      synchronized (ctx.getCheckpointLock()) {
-//        while (running && numCheckpointsComplete.get() < checkpointToAwait) {
-//          ctx.getCheckpointLock().wait(1);
-//        }
-//      }
-
     }
 
     @Override

@@ -3,3 +3,4 @@ target
 warehouse
 hive.properties
 *.log
+*.DS_Store

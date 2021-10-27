@@ -32,7 +32,7 @@ import static org.apache.iceberg.types.Types.NestedField.optional;
 import static org.apache.iceberg.types.Types.NestedField.required;
 
 public class HiveCatalogExample {
-    protected static final String DB_NAME = "hivedb";
+    protected static final String DB_NAME = "hive_db";
     static final String TABLE_NAME = "tbl";
 
     static final Schema schema = new Schema(Types.StructType.of(
@@ -45,7 +45,7 @@ public class HiveCatalogExample {
     public static TemporaryFolder tempFolder = new TemporaryFolder();
     protected static HiveMetaStoreClient metastoreClient;
     protected static HiveConf hiveConf;
-    protected static HiveCatalog catalog;
+    protected static HiveCatalog hiveCatalog;
 
     private static org.apache.hadoop.hive.metastore.api.Table createHiveTable(String hiveTableName) throws IOException {
         Map<String, String> parameters = Maps.newHashMap();
@@ -77,7 +77,7 @@ public class HiveCatalogExample {
             FileUtils.deleteDirectory(warehouse);
         String hiveLocalDir = warehouse.getAbsolutePath();
         hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "file:" + hiveLocalDir);
-        catalog = new HiveCatalog(hiveConf);
+        hiveCatalog = new HiveCatalog(hiveConf);
         metastoreClient = new HiveMetaStoreClient(hiveConf);
 
         String dbPath = new File(hiveLocalDir, DB_NAME + ".db").getPath();
@@ -89,22 +89,22 @@ public class HiveCatalogExample {
         String hiveTableName = "test_hive_table";
         org.apache.hadoop.hive.metastore.api.Table hiveTable = createHiveTable(hiveTableName);
         metastoreClient.createTable(hiveTable);
-        Assert.assertTrue(catalog.tableExists(TABLE_IDENTIFIER));
+        Assert.assertTrue(hiveCatalog.tableExists(TABLE_IDENTIFIER));
 
-        List<TableIdentifier> tableIdents = catalog.listTables(TABLE_IDENTIFIER.namespace());
+        List<TableIdentifier> tableIdents = hiveCatalog.listTables(TABLE_IDENTIFIER.namespace());
         List<TableIdentifier> expectedIdents = tableIdents.stream()
                 .filter(t -> t.namespace().level(0).equals(DB_NAME) && t.name().equals(TABLE_NAME))
                 .collect(Collectors.toList());
         Assert.assertEquals(1, expectedIdents.size());
         metastoreClient.dropTable(DB_NAME, hiveTableName);
 
-        Path tableLocation = new Path(catalog.createTable(TABLE_IDENTIFIER, schema, partitionSpec).location());
-        Assert.assertTrue(catalog.tableExists(TABLE_IDENTIFIER));
-        List<TableIdentifier> tableIdents1 = catalog.listTables(TABLE_IDENTIFIER.namespace());
+        Path tableLocation = new Path(hiveCatalog.createTable(TABLE_IDENTIFIER, schema, partitionSpec).location());
+        Assert.assertTrue(hiveCatalog.tableExists(TABLE_IDENTIFIER));
+        List<TableIdentifier> tableIdents1 = hiveCatalog.listTables(TABLE_IDENTIFIER.namespace());
         Assert.assertEquals("should only 1 iceberg table .", 1, tableIdents1.size());
 
         tableLocation.getFileSystem(hiveConf).delete(tableLocation, true);
-        catalog.dropTable(TABLE_IDENTIFIER, false /* metadata only, location was already deleted */);
+        hiveCatalog.dropTable(TABLE_IDENTIFIER, false /* metadata only, location was already deleted */);
         metastoreClient.dropDatabase(db.getName());
     }
 }
