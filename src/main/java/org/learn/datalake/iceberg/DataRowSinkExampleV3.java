@@ -1,9 +1,6 @@
 package org.learn.datalake.iceberg;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -17,17 +14,16 @@ import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.io.CloseableIterable;
-import org.junit.rules.TemporaryFolder;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
+import java.util.List;
 
-import static org.learn.datalake.metadata.TableTestBase.getTableOrCreate;
+import static org.learn.datalake.common.TableTestBase.getTableOrCreate;
 
 //https://github.com/ververica/flink-cdc-connectors
 
@@ -50,9 +46,32 @@ public class DataRowSinkExampleV3 extends ExampleBase {
         TypeInformation<Row> ROW_TYPE_INFO = new RowTypeInfo(
                 SimpleDataUtil.FLINK_SCHEMA.getFieldTypes());
 
+        List<List<Row>> elementsPerCheckpoint = ImmutableList.of(
+                // Checkpoint #1
+                ImmutableList.of(
+                        row("+I", 1,  "aaa"),
+                        row("+U", 1,  "AAA")
+
+                )
+                // Checkpoint #2
+//                ImmutableList.of(
+//                        row("+I", 2,  "bbb")
+//                )
+//                // Checkpoint #3
+//                ImmutableList.of(
+//                        row("-D", 1, "aaa"),
+//                        row("+I", 1, "aaa")
+//                ),
+//                // Checkpoint #4
+//                ImmutableList.of(
+//                        row("-U", 1, "aaa"),
+//                        row("+U", 1, "aaa"),
+//                        row("+I", 1, "aaa")
+//                )
+        );
+
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
-                        row("+I", 1, "aaa"),
-                        row("-D", 1, "aaa")
+                        elementsPerCheckpoint
                 ), ROW_TYPE_INFO)
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(SimpleDataUtil.ROW_TYPE));
 
@@ -66,7 +85,7 @@ public class DataRowSinkExampleV3 extends ExampleBase {
         File warehouse = new File("warehouse/test_upsert_file_V3");
         Table table = getTableOrCreate(warehouse,true);
 
-        dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));
+        //dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));
         TableOperations operations = ((BaseTable) table).operations();
         TableMetadata metadata = operations.current();
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));

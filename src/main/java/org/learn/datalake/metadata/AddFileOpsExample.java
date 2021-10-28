@@ -1,4 +1,4 @@
-package org.learn.datalake.data;
+package org.learn.datalake.metadata;
 
 import com.google.common.collect.Iterables;
 import org.apache.iceberg.*;
@@ -12,7 +12,7 @@ import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.FileAppender;
 import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
-import org.learn.datalake.metadata.TableTestBase;
+import org.learn.datalake.common.TableTestBase;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,19 +23,16 @@ import static org.apache.iceberg.Files.localInput;
 
 //Reference TestRewriteDataFilesAction
 public class AddFileOpsExample extends TableTestBase {
-    public AddFileOpsExample() {
-        super(2);
-    }
 
     public static void main(String[] args) throws Exception {
         File warehouse=new File("warehouse/test_add_file");
-        Table table = getTableOrCreate(warehouse,false);
+        Table table = getTableOrCreate(warehouse,true);
         List<GenericRecord> recordList = mockInsertData();
         DataFile dataFile = writeParquetFile(table, recordList, new File(new File(warehouse.getAbsolutePath() + "/data/"), "data-1.parquet"));
         table.newAppend()
                 .appendFile(dataFile)
                 .commit();
-        recordList = mockUpsertData();
+        recordList = mockInsertData();
         dataFile = writeParquetFile(table, recordList, new File(new File(warehouse.getAbsolutePath() + "/data/"), "data-2.parquet"));
         table.newAppend()
                 .appendFile(dataFile)
@@ -79,19 +76,6 @@ public class AddFileOpsExample extends TableTestBase {
         GenericRecord rec = GenericRecord.create(SCHEMA);
         rec.setField("id", 1);
         rec.setField("data", "aaa");
-        records.add(rec);
-        rec = GenericRecord.create(SCHEMA);
-        rec.setField("id", 1);
-        rec.setField("data", "bbb");
-        records.add(rec);
-        return records;
-    }
-
-    static List<GenericRecord> mockUpsertData() {
-        List<GenericRecord> records = new ArrayList<>();
-        GenericRecord rec = GenericRecord.create(SCHEMA);
-        rec.setField("id", 1);
-        rec.setField("data", "bbb");
         records.add(rec);
         return records;
     }

@@ -1,6 +1,7 @@
 package org.learn.datalake.iceberg;
 
 import com.google.common.collect.Iterables;
+import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -40,16 +41,11 @@ import java.util.Map;
 
 //Reference iceberg HadoopTableTestBase
 public class CatalogSinkExample extends ExampleBase {
-    private static final Schema tableSchema =
-            new Schema(
-                    Types.NestedField.optional(1, "id", Types.IntegerType.get()),
-                    Types.NestedField.optional(2, "data", Types.StringType.get())
-            );
-
     //--warehouse warehouse/hive_db/hive_table -hive_db hive_db --hive_table hive_table --catalog_type hive
     public static void main(String[] args) throws Exception {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();
         checkpointConfig.setCheckpointInterval(100L);
 //        checkpointConfig.setMinPauseBetweenCheckpoints(60 * 1000L);
@@ -65,9 +61,8 @@ public class CatalogSinkExample extends ExampleBase {
 
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
                         row("+I", 1, "aaa"),
-//                        row("+I", 1, "aaa"),
-                        row("+U", 1, "AAA"),
-                        row("+I", 2, "bbb")), ROW_TYPE_INFO)
+                        row("+U", 1, "AAA")
+                ), ROW_TYPE_INFO)
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(rowType));
 
         //https://iceberg.apache.org/flink/#hive-catalog
@@ -75,9 +70,9 @@ public class CatalogSinkExample extends ExampleBase {
         properties.put("type", "iceberg");
         properties.put("property-version", "1");
         File warehouse = new File(parameterTool.get("warehouse"));
-//        if (warehouse.exists())
-//            FileUtils.cleanDirectory(warehouse);
-//        warehouse.mkdirs();
+        if (warehouse.exists())
+            FileUtils.cleanDirectory(warehouse);
+        warehouse.mkdirs();
         String warehouseDir = warehouse.getAbsolutePath();
         properties.put("warehouse", parameterTool.get("warehouse"));
         String catalogType = parameterTool.get("catalog_type", "hadoop");
@@ -122,7 +117,7 @@ public class CatalogSinkExample extends ExampleBase {
             table = catalog.loadTable(tableIdentifier);
         } else {
             table =
-                    catalog.buildTable(tableIdentifier, tableSchema)
+                    catalog.buildTable(tableIdentifier, SimpleDataUtil.SCHEMA)
                             .withPartitionSpec(PartitionSpec.unpartitioned())
                             .create();
         }
@@ -136,7 +131,6 @@ public class CatalogSinkExample extends ExampleBase {
                 .table(table)
                 .tableLoader(tableLoader)
                 .equalityFieldColumns(ImmutableList.of("id"))//Arrays.asList("id"))
-                .writeParallelism(1)
                 .build();
 
         env.execute();

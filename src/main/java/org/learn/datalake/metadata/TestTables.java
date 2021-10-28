@@ -128,18 +128,6 @@ public class TestTables {
     }
   }
 
-  static TableMetadata readMetadata(String tableName) {
-    synchronized (METADATA) {
-      return METADATA.get(tableName);
-    }
-  }
-
-  static Integer metadataVersion(String tableName) {
-    synchronized (METADATA) {
-      return VERSIONS.get(tableName);
-    }
-  }
-
   public static class TestTableOperations implements TableOperations {
 
     private final String tableName;
@@ -227,7 +215,7 @@ public class TestTables {
     }
   }
 
-  static class LocalFileIO implements FileIO {
+  public static class LocalFileIO implements FileIO {
 
     @Override
     public InputFile newInputFile(String path) {

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.learn.datalake.metadata;
+package org.learn.datalake.common;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -39,6 +39,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.learn.datalake.common.SimpleDataUtil;
+import org.learn.datalake.metadata.TestTables;
 
 import java.io.File;
 import java.io.IOException;
@@ -150,12 +151,6 @@ public class TableTestBase {
             .withFileSizeInBytes(350)
             .build();
 
-    public TableTestBase(int formatVersion) {
-        this.formatVersion = formatVersion;
-        this.V1Assert = new Assertions(1, formatVersion);
-        this.V2Assert = new Assertions(2, formatVersion);
-    }
-
     static Iterator<Long> seqs(long... seqs) {
         return LongStream.of(seqs).iterator();
     }
@@ -172,16 +167,8 @@ public class TableTestBase {
         return Iterators.forArray(files);
     }
 
-    static Iterator<DataFile> files(ManifestFile manifest) {
-        return ManifestFiles.read(manifest, FILE_IO).iterator();
-    }
+    protected static final int formatVersion=2;
 
-    static final FileIO FILE_IO = new TestTables.LocalFileIO();
-    protected final int formatVersion;
-    @SuppressWarnings("checkstyle:MemberName")
-    protected final Assertions V1Assert;
-    @SuppressWarnings("checkstyle:MemberName")
-    protected final Assertions V2Assert;
     //private TestTables.TestTable table = null;
     File tableDir = null;
     File metadataDir = null;
@@ -228,20 +215,10 @@ public class TableTestBase {
         return TestTables.load(tableDir, "test");
     }
 
-    Integer version() {
-        return TestTables.metadataVersion("test");
-    }
-
-    public TableMetadata readMetadata() {
-        return TestTables.readMetadata("test");
-    }
-
-    ManifestFile writeManifest(Long snapshotId, File manifestFile, DataFile... files) throws IOException {
-        if (manifestFile.exists())
-            manifestFile.delete();
-        OutputFile outputFile = hadoopTab.io().newOutputFile(manifestFile.getCanonicalPath());
-
-        ManifestWriter<DataFile> writer = ManifestFiles.write(formatVersion, hadoopTab.spec(), outputFile, snapshotId);
+   static TestTables.LocalFileIO FILE_IO=new TestTables.LocalFileIO();
+    public static ManifestFile writeManifest(Long snapshotId, Table table,File manifestFile, DataFile... files) throws IOException {
+        OutputFile outputFile = FILE_IO.newOutputFile(manifestFile.getCanonicalPath());
+        ManifestWriter<DataFile> writer = ManifestFiles.write(formatVersion, table.spec(), outputFile, snapshotId);
         try {
             for (DataFile file : files) {
                 writer.add(file);
@@ -249,7 +226,6 @@ public class TableTestBase {
         } finally {
             writer.close();
         }
-
         return writer.toManifestFile();
     }
 

@@ -46,6 +46,7 @@ import org.apache.iceberg.relocated.com.google.common.base.Preconditions;
 import org.apache.iceberg.relocated.com.google.common.collect.HashMultiset;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
+import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.Pair;
 import org.apache.iceberg.util.StructLikeSet;
@@ -53,9 +54,7 @@ import org.apache.iceberg.util.StructLikeWrapper;
 import org.junit.Assert;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.apache.iceberg.hadoop.HadoopOutputFile.fromPath;
 
@@ -65,8 +64,8 @@ public class SimpleDataUtil {
   }
 
   public static final Schema SCHEMA = new Schema(
-      Types.NestedField.optional(1, "id", Types.IntegerType.get()),
-      Types.NestedField.optional(2, "data", Types.StringType.get())
+          Types.NestedField.required(1, "id", Types.IntegerType.get()),
+          Types.NestedField.optional(2, "data", Types.StringType.get())
   );
 
   public static final TableSchema FLINK_SCHEMA = TableSchema.builder()

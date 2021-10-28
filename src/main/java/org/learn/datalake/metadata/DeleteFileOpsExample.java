@@ -1,24 +1,19 @@
-package org.learn.datalake.data;
+package org.learn.datalake.metadata;
 
 import com.google.common.collect.Iterables;
-import org.apache.commons.io.FileUtils;
 import org.apache.iceberg.*;
-import org.apache.iceberg.actions.RewriteDataFilesActionResult;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.deletes.EqualityDeleteWriter;
-import org.apache.iceberg.flink.actions.Actions;
-import org.apache.iceberg.hadoop.HadoopTables;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.FileAppender;
 import org.apache.iceberg.io.OutputFile;
 import org.apache.iceberg.parquet.Parquet;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.StructLikeSet;
-import org.learn.datalake.metadata.TableTestBase;
+import org.learn.datalake.common.TableTestBase;
 
 import java.io.Closeable;
 import java.io.File;
@@ -31,9 +26,6 @@ import static org.apache.iceberg.Files.localInput;
 
 //Reference DeleteReadTests
 public class DeleteFileOpsExample extends TableTestBase {
-    public DeleteFileOpsExample() {
-        super(2);
-    }
 
     public static void main(String[] args) throws Exception {
         File warehouse = new File("warehouse/test_del_file");
