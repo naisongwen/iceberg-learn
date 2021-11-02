@@ -59,26 +59,6 @@ public class ManifestMergeExample extends TableTestBase {
         System.out.println(data);
     }
 
-    static DataFile writeParquetFile(Table table, List<GenericRecord> records, File parquetFile) throws IOException {
-        FileAppender<GenericRecord> appender = Parquet.write(Files.localOutput(parquetFile))
-                .schema(table.schema())
-                .createWriterFunc(GenericParquetWriter::buildWriter)
-                .build();
-        try {
-            appender.addAll(records);
-        } finally {
-            appender.close();
-        }
-
-        PartitionKey partitionKey = new PartitionKey(table.spec(), table.schema());
-        return DataFiles.builder(table.spec())
-                .withPartition(partitionKey)
-                .withInputFile(localInput(parquetFile))
-                .withMetrics(appender.metrics())
-                .withFormat(FileFormat.PARQUET)
-                .build();
-    }
-
     static List<GenericRecord> mockInsertData() {
         List<GenericRecord> records = new ArrayList<>();
         GenericRecord rec = GenericRecord.create(SCHEMA);

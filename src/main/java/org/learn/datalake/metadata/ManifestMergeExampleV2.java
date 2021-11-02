@@ -59,41 +59,6 @@ public class ManifestMergeExampleV2 extends TableTestBase {
         printManifest(snapshot);
     }
 
-    static void printManifest(Snapshot snapshot){
-        List<ManifestFile> manifestFiles=snapshot.allManifests();
-        for(ManifestFile m:manifestFiles) {
-            System.out.println(m.path()+" owns datafiles as below:");
-            ManifestReader<DataFile> reader = ManifestFiles.read(m, new TestTables.LocalFileIO());
-            List<String> files = Streams.stream(reader)
-                    .map(file -> file.path().toString())
-                    .collect(Collectors.toList());
-            for (CloseableIterator<DataFile> it = reader.iterator(); it.hasNext(); ) {
-                DataFile entry = it.next();
-                System.out.println(entry.path());
-            }
-        }
-    }
-
-    static DataFile writeParquetFile(Table table, List<GenericRecord> records, File parquetFile) throws IOException {
-        FileAppender<GenericRecord> appender = Parquet.write(Files.localOutput(parquetFile))
-                .schema(table.schema())
-                .createWriterFunc(GenericParquetWriter::buildWriter)
-                .build();
-        try {
-            appender.addAll(records);
-        } finally {
-            appender.close();
-        }
-
-        PartitionKey partitionKey = new PartitionKey(table.spec(), table.schema());
-        return DataFiles.builder(table.spec())
-                .withPartition(partitionKey)
-                .withInputFile(localInput(parquetFile))
-                .withMetrics(appender.metrics())
-                .withFormat(FileFormat.PARQUET)
-                .build();
-    }
-
     static List<GenericRecord> mockInsertData() {
         List<GenericRecord> records = new ArrayList<>();
         GenericRecord rec = GenericRecord.create(SCHEMA);

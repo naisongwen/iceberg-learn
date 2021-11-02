@@ -22,16 +22,19 @@ package org.learn.datalake.common;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.*;
+import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.data.GenericRecord;
+import org.apache.iceberg.data.IcebergGenerics;
+import org.apache.iceberg.data.Record;
+import org.apache.iceberg.data.parquet.GenericParquetWriter;
+import org.apache.iceberg.deletes.EqualityDeleteWriter;
 import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.hadoop.HadoopTables;
-import org.apache.iceberg.io.FileIO;
-import org.apache.iceberg.io.OutputFile;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
-import org.apache.iceberg.relocated.com.google.common.collect.Iterators;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
-import org.apache.iceberg.relocated.com.google.common.collect.Sets;
+import org.apache.iceberg.io.*;
+import org.apache.iceberg.parquet.Parquet;
+import org.apache.iceberg.relocated.com.google.common.collect.*;
 import org.apache.iceberg.relocated.com.google.common.io.Files;
 import org.apache.iceberg.types.Conversions;
 import org.apache.iceberg.types.Types;
@@ -41,11 +44,14 @@ import org.junit.Before;
 import org.learn.datalake.common.SimpleDataUtil;
 import org.learn.datalake.metadata.TestTables;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
+import static org.apache.iceberg.Files.localInput;
 import static org.apache.iceberg.types.Types.NestedField.required;
 
 public class TableTestBase {
@@ -74,6 +80,13 @@ public class TableTestBase {
     public static final Schema SCHEMA = new Schema(
             required(1, "id", Types.IntegerType.get()),
             required(2, "data", Types.StringType.get())
+    );
+
+    // Schema passed to create tables
+    public static final Schema SCHEMA2 = new Schema(
+            required(1, "id", Types.IntegerType.get()),
+            required(2, "data", Types.StringType.get()),
+            required(3, "eventTime", Types.TimestampType.withoutZone())
     );
 
     // Partition spec used to create tables
@@ -284,32 +297,73 @@ public class TableTestBase {
         return paths;
     }
 
-    /**
-     * Used for assertions that only apply if the table version is v2.
-     */
-    protected static class Assertions {
-        private final boolean enabled;
+    protected static void printTableData(Table table){
+        CloseableIterable<Record> iterable = IcebergGenerics.read(table).build();
+        String data = com.google.common.collect.Iterables.toString(iterable);
+        System.out.println("data in table "+table.name());
+        System.out.println(data);
+    }
 
-        private Assertions(int validForVersion, int formatVersion) {
-            this.enabled = validForVersion == formatVersion;
-        }
-
-        void assertEquals(String context, int expected, int actual) {
-            if (enabled) {
-                Assert.assertEquals(context, expected, actual);
+    protected static void printManifest(Snapshot snapshot){
+        List<ManifestFile> manifestFiles=snapshot.allManifests();
+        for(ManifestFile m:manifestFiles) {
+            System.out.println(m.path()+" owns datafiles as belows:");
+            if(m.content()== ManifestContent.DATA) {
+                ManifestReader<DataFile> reader = ManifestFiles.read(m, new TestTables.LocalFileIO());
+                List<String> files = Streams.stream(reader)
+                        .map(file -> file.path().toString())
+                        .collect(Collectors.toList());
+                for (CloseableIterator<DataFile> it = reader.iterator(); it.hasNext(); ) {
+                    DataFile entry = it.next();
+                    System.out.println(entry.path());
+                }
+            }else {
+                ManifestReader<DeleteFile> reader = ManifestFiles.readDeleteManifest(m, new TestTables.LocalFileIO(), null);
+                List<String> files = Streams.stream(reader)
+                        .map(file -> file.path().toString())
+                        .collect(Collectors.toList());
+                for (CloseableIterator<DeleteFile> it = reader.iterator(); it.hasNext(); ) {
+                    DeleteFile entry = it.next();
+                    System.out.println(entry.path());
+                }
             }
         }
+    }
 
-        void assertEquals(String context, long expected, long actual) {
-            if (enabled) {
-                Assert.assertEquals(context, expected, actual);
-            }
+    protected static DataFile writeParquetFile(Table table, List<GenericRecord> records, File parquetFile) throws IOException {
+        FileAppender<GenericRecord> appender = Parquet.write(org.apache.iceberg.Files.localOutput(parquetFile))
+                .schema(table.schema())
+                .createWriterFunc(GenericParquetWriter::buildWriter)
+                .build();
+        try {
+            appender.addAll(records);
+        } finally {
+            appender.close();
         }
 
-        void assertEquals(String context, Object expected, Object actual) {
-            if (enabled) {
-                Assert.assertEquals(context, expected, actual);
-            }
+        PartitionKey partitionKey = new PartitionKey(table.spec(), table.schema());
+        return DataFiles.builder(table.spec())
+                .withPartition(partitionKey)
+                .withInputFile(localInput(parquetFile))
+                .withMetrics(appender.metrics())
+                .withFormat(FileFormat.PARQUET)
+                .build();
+    }
+
+    protected static DeleteFile writeDeleteFile(Table table, OutputFile out, StructLike partition,
+                                             List<GenericRecord> deletes, Schema deleteRowSchema) throws IOException {
+        EqualityDeleteWriter<GenericRecord> writer = Parquet.writeDeletes(out)
+                .forTable(table)
+                .withPartition(partition)
+                .rowSchema(deleteRowSchema)
+                .createWriterFunc(GenericParquetWriter::buildWriter)
+                .overwrite()
+                .equalityFieldIds(deleteRowSchema.columns().stream().mapToInt(Types.NestedField::fieldId).toArray())
+                .buildEqualityWriter();
+
+        try (Closeable toClose = writer) {
+            writer.deleteAll(deletes);
         }
+        return writer.toDeleteFile();
     }
 }

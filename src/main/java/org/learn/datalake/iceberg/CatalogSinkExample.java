@@ -69,12 +69,12 @@ public class CatalogSinkExample extends ExampleBase {
         Map<String, String> properties = new HashMap<>();
         properties.put("type", "iceberg");
         properties.put("property-version", "1");
-        File warehouse = new File(parameterTool.get("warehouse"));
+        File warehouse = new File(parameterTool.get("warehouse"),"test_sink");
         if (warehouse.exists())
             FileUtils.cleanDirectory(warehouse);
         warehouse.mkdirs();
         String warehouseDir = warehouse.getAbsolutePath();
-        properties.put("warehouse", parameterTool.get("warehouse"));
+        properties.put("warehouse", warehouse.getAbsolutePath());
         String catalogType = parameterTool.get("catalog_type", "hadoop");
         CatalogLoader catalogLoader = null;
         if ("hadoop".equals(catalogType)) {
