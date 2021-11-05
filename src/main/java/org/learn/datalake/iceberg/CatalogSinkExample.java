@@ -61,7 +61,8 @@ public class CatalogSinkExample extends ExampleBase {
 
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSource<>(
                         row("+I", 1, "aaa"),
-                        row("+U", 1, "AAA")
+                        row("-D", 1, "aaa")
+//                        row("+U", 1, "AAA")
                 ), ROW_TYPE_INFO)
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(rowType));
 
@@ -69,12 +70,13 @@ public class CatalogSinkExample extends ExampleBase {
         Map<String, String> properties = new HashMap<>();
         properties.put("type", "iceberg");
         properties.put("property-version", "1");
-        File warehouse = new File(parameterTool.get("warehouse"),"test_sink");
-        if (warehouse.exists())
-            FileUtils.cleanDirectory(warehouse);
-        warehouse.mkdirs();
-        String warehouseDir = warehouse.getAbsolutePath();
-        properties.put("warehouse", warehouse.getAbsolutePath());
+        File warehouseBase = new File(parameterTool.get("warehouse"));
+        File tableDir = new File(parameterTool.get("warehouse")+File.separator+parameterTool.get("hive_db")+File.separator+parameterTool.get("hive_table"));
+        if (tableDir.exists())
+            FileUtils.cleanDirectory(tableDir);
+        tableDir.mkdirs();
+        String warehouseDir = warehouseBase.getAbsolutePath();
+        properties.put("warehouse", warehouseBase.getAbsolutePath());
         String catalogType = parameterTool.get("catalog_type", "hadoop");
         CatalogLoader catalogLoader = null;
         if ("hadoop".equals(catalogType)) {

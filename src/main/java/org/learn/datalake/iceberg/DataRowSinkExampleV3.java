@@ -33,6 +33,7 @@ public class DataRowSinkExampleV3 extends ExampleBase {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();
+        env.setParallelism(1);
         checkpointConfig.setCheckpointInterval(100L);
 //        checkpointConfig.setMinPauseBetweenCheckpoints(60 * 1000L);
 //        checkpointConfig.setTolerableCheckpointFailureNumber(10);
@@ -50,12 +51,11 @@ public class DataRowSinkExampleV3 extends ExampleBase {
                 // Checkpoint #1
                 ImmutableList.of(
                         row("+I", 1,  "aaa"),
-                        row("+U", 1,  "AAA")
-
+                        row("+U", 1,  "bbb")
                 )
                 // Checkpoint #2
 //                ImmutableList.of(
-//                        row("+I", 2,  "bbb")
+//                        row("-D", 1, "aaa")
 //                )
 //                // Checkpoint #3
 //                ImmutableList.of(
@@ -82,7 +82,7 @@ public class DataRowSinkExampleV3 extends ExampleBase {
 //                .map(CONVERTER::toInternal, RowDataTypeInfo.of(SimpleDataUtil.ROW_TYPE));
 
 
-        File warehouse = new File("warehouse/test_upsert_file_V3");
+        File warehouse = new File("warehouse/test_sink_V3");
         Table table = getTableOrCreate(warehouse,true);
 
         //dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));

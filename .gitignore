@@ -4,3 +4,4 @@ warehouse
 hive.properties
 *.log
 *.DS_Store
+parquet-tools-1.10.0.jar

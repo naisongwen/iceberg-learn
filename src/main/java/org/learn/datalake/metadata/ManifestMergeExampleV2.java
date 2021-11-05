@@ -31,6 +31,11 @@ public class ManifestMergeExampleV2 extends TableTestBase {
         DataFile dataFileA = writeParquetFile(table, recordList, new File(new File(warehouse.getAbsolutePath() + "/data/"), "data-1.parquet"));
         DataFile dataFileB = writeParquetFile(table, recordList, new File(new File(warehouse.getAbsolutePath() + "/data/"), "data-2.parquet"));
 
+
+        table.updateProperties()
+                .set(TableProperties.MANIFEST_MIN_MERGE_COUNT, "1")
+                .commit();
+
         table.newAppend()
                 .appendFile(dataFileA)
                 .commit();
@@ -42,15 +47,11 @@ public class ManifestMergeExampleV2 extends TableTestBase {
         Snapshot snapshot = table.currentSnapshot();
         printManifest(snapshot);
 
-//        table.updateProperties()
-//                .set(TableProperties.MANIFEST_MIN_MERGE_COUNT, "1")
+//        File manifestFile=new File(new File(warehouse.getAbsolutePath() + "/metadata/"), "manifest-0.avro");
+//        ManifestFile manifest = writeManifest(null,table,manifestFile,dataFileA, dataFileB);
+//        table.newAppend()
+//                .appendManifest(manifest)
 //                .commit();
-
-        File manifestFile=new File(new File(warehouse.getAbsolutePath() + "/metadata/"), "manifest-0.avro");
-        ManifestFile manifest = writeManifest(null,table,manifestFile,dataFileA, dataFileB);
-        table.newAppend()
-                .appendManifest(manifest)
-                .commit();
 
         CloseableIterable<Record> iterable = IcebergGenerics.read(table).build();
         String data = Iterables.toString(iterable);

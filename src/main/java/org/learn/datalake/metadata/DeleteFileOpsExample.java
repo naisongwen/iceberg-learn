@@ -33,94 +33,56 @@ import java.util.UUID;
 //Reference DeleteReadTests
 public class DeleteFileOpsExample extends TableTestBase {
 
-    static ImmutableList createDeleteRecords() {
+    public static void main(String[] args) throws Exception {
+        File warehouse = new File("warehouse/test_del_file");
+        Table table = getTableOrCreate(warehouse, true);
+
+        List<GenericRecord> mockInsertRecordList = mockInsertRecords();
+        File addFile=new File(new File(warehouse.getAbsolutePath() + "/data/"), UUID.randomUUID() + ".parquet");
+        DataFile dataFile = writeParquetFile(table, mockInsertRecordList,addFile );
+        table.newAppend()
+                .appendFile(dataFile)
+                .commit();
+
+        List<GenericRecord> mockDeleteRecords = mockDeleteRecords();
+        File outFile=new File(new File(warehouse.getAbsolutePath() + "/data/"), UUID.randomUUID() + ".parquet");
+        DeleteFile deleteFile = posDelete(table, mockDeleteRecords,addFile, outFile);
+        TableOperations operations = ((BaseTable) table).operations();
+        TableMetadata metadata = operations.current();
+        operations.commit(metadata, metadata.upgradeToFormatVersion(2));
+        table.newRowDelta()
+//                .addRows(dataFile)
+                .addDeletes(deleteFile)
+                .commit();
+
+        CloseableIterable<Record> iterable = IcebergGenerics.read(table).build();
+        String data = Iterables.toString(iterable);
+        System.out.println(data);
+
+    }
+
+    static ImmutableList mockInsertRecords() {
         GenericRecord record = GenericRecord.create(SCHEMA);
 
         ImmutableList.Builder<Record> builder = ImmutableList.builder();
         builder.add(record.copy(ImmutableMap.of("id", 1, "data", "a")));
-        builder.add(record.copy(ImmutableMap.of("id", 2, "data", "b")));
-        builder.add(record.copy(ImmutableMap.of("id", 3, "data", "c")));
-        builder.add(record.copy(ImmutableMap.of("id", 4, "data", "d")));
-        builder.add(record.copy(ImmutableMap.of("id", 5, "data", "e")));
+        builder.add(record.copy(ImmutableMap.of("id", 2, "data", "bb")));
+        builder.add(record.copy(ImmutableMap.of("id", 3, "data", "ccc")));
+        builder.add(record.copy(ImmutableMap.of("id", 4, "data", "dddd")));
 
         ImmutableList records = builder.build();
         return records;
     }
 
-    static void writePosDelete(Table table,List<Record> recordList,File file) throws IOException {
-        OutputFile out = Files.localOutput(new File(table.location() + "/data/", UUID.randomUUID() + ".avro"));
-        PositionDeleteWriter<Record> deleteWriter = Parquet.writeDeletes(out)
-                .createWriterFunc(GenericParquetWriter::buildWriter)
-                .overwrite()
-                .rowSchema(SCHEMA)
-                .withSpec(PartitionSpec.unpartitioned())
-                .buildPositionWriter();
 
-        String deletePath = "s3://bucket/path/file.parquet";
-        try (PositionDeleteWriter<Record> writer = deleteWriter) {
-            for (int i = 0; i < recordList.size(); i += 1) {
-                int pos = i * 3 + 2;
-                writer.delete(deletePath, pos, recordList.get(i));
-            }
-        }
+    static ImmutableList mockDeleteRecords() {
+        GenericRecord record = GenericRecord.create(SCHEMA);
 
-        DeleteFile metadata = deleteWriter.toDeleteFile();
-        Assert.assertEquals("Format should be Parquet", FileFormat.PARQUET, metadata.format());
-        Assert.assertEquals("Should be position deletes", FileContent.POSITION_DELETES, metadata.content());
-        Assert.assertEquals("Record count should be correct", recordList.size(), metadata.recordCount());
-        Assert.assertEquals("Partition should be empty", 0, metadata.partition().size());
-        Assert.assertNull("Key metadata should be null", metadata.keyMetadata());
+        ImmutableList.Builder<Record> builder = ImmutableList.builder();
+        builder.add(record.copy(ImmutableMap.of("id", 1, "data", "a")));
+        builder.add(record.copy(ImmutableMap.of("id", 2, "data", "b")));
 
-        List<Record> deletedRecords;
-        try (CloseableIterable<Record> reader = Parquet.read(out.toInputFile())
-                .project(table.schema())
-                .createReaderFunc(fileSchema -> GenericParquetReaders.buildReader(table.schema(), fileSchema))
-                .build()) {
-            deletedRecords = Lists.newArrayList(reader);
-
-        }
-    }
-
-    public static void main(String[] args) throws Exception {
-        File warehouse = new File("warehouse/test_del_file");
-        Table table = getTableOrCreate(warehouse, true);
-        ImmutableList records = createDeleteRecords();
-        OutputFile out = Files.localOutput(new File(warehouse.getAbsolutePath() + "/data/", UUID.randomUUID() + ".avro"));
-
-        EqualityDeleteWriter<Record> deleteWriter =
-                //Parquet.writeDeletes(out).createWriterFunc(GenericParquetWriter::buildWriter)
-                Avro.writeDeletes(out).createWriterFunc(DataWriter::create)
-                .overwrite()
-                .rowSchema(SCHEMA)
-                .withSpec(PartitionSpec.unpartitioned())
-                .equalityFieldIds(table.schema().columns().stream().mapToInt(Types.NestedField::fieldId).toArray())
-                .buildEqualityWriter();
-
-        try (EqualityDeleteWriter<Record> writer = deleteWriter) {
-            writer.deleteAll(records);
-        }
-
-        DeleteFile metadata = deleteWriter.toDeleteFile();
-        Assert.assertEquals("Format should be Parquet", FileFormat.AVRO, metadata.format());
-        Assert.assertEquals("Should be equality deletes", FileContent.EQUALITY_DELETES, metadata.content());
-        Assert.assertEquals("Record count should be correct", records.size(), metadata.recordCount());
-        Assert.assertEquals("Partition should be empty", 0, metadata.partition().size());
-        Assert.assertNull("Key metadata should be null", metadata.keyMetadata());
-
-        List<Record> deletedRecords;
-        try (CloseableIterable<Record> reader = Avro.read(out.toInputFile())
-                .project(SCHEMA)
-                .createReaderFunc(DataReader::create)
-                .build()) {
-            deletedRecords = Lists.newArrayList(reader);
-        }
-
-//        try (CloseableIterable<Record> reader = Parquet.read(out.toInputFile())
-//                .project(SCHEMA)
-//                .createReaderFunc(fileSchema -> GenericParquetReaders.buildReader(SCHEMA, fileSchema))
-//                .build()) {
-//            deletedRecords = Lists.newArrayList(reader);
-//        }
-        Assert.assertEquals("Deleted records should match expected", records, deletedRecords);
+        ImmutableList records = builder.build();
+        return records;
     }
 }

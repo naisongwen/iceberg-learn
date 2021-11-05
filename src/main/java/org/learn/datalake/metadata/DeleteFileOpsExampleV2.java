@@ -5,24 +5,14 @@ import org.apache.iceberg.*;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
-import org.apache.iceberg.data.parquet.GenericParquetWriter;
-import org.apache.iceberg.deletes.EqualityDeleteWriter;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.io.FileAppender;
-import org.apache.iceberg.io.OutputFile;
-import org.apache.iceberg.parquet.Parquet;
-import org.apache.iceberg.types.Types;
 import org.apache.iceberg.util.StructLikeSet;
 import org.learn.datalake.common.TableTestBase;
 
-import java.io.Closeable;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import static org.apache.iceberg.Files.localInput;
 
 //Reference DeleteReadTests
 public class DeleteFileOpsExampleV2 extends TableTestBase {
@@ -32,12 +22,12 @@ public class DeleteFileOpsExampleV2 extends TableTestBase {
         Table table = getTableOrCreate(warehouse,true);
         List<GenericRecord> recordList = mockInsertData();
         DataFile dataFile = writeParquetFile(table, recordList, new File(new File(warehouse.getAbsolutePath() + "/data/"), UUID.randomUUID()+".parquet"));
-//        table.newAppend()
-//                .appendFile(dataFile)
-//                .commit();
+        table.newAppend()
+                .appendFile(dataFile)
+                .commit();
         recordList = mockDeleteData();
         File output=new File(new File(warehouse.getAbsolutePath() + "/data/"), UUID.randomUUID()+".parquet");
-        DeleteFile deleteFile = writeDeleteFile(table,Files.localOutput(output), null, recordList, SCHEMA);
+        DeleteFile deleteFile = equalityDelete(table,output, null, recordList);
         TableOperations operations = ((BaseTable) table).operations();
         TableMetadata metadata = operations.current();
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));
@@ -58,30 +48,6 @@ public class DeleteFileOpsExampleV2 extends TableTestBase {
         CloseableIterable<Record> iterable = IcebergGenerics.read(table).build();
         String data = Iterables.toString(iterable);
         System.out.println(data);
-    }
-
-    static DeleteFile writeEqDeletes(PartitionSpec spec,File output) {
-        return FileMetadata.deleteFileBuilder(spec)
-                .ofEqualityDeletes(0)
-                .withPath(output.getAbsolutePath())
-                .build();
-    }
-
-    public static DeleteFile writeDeleteFile(Table table, OutputFile out, StructLike partition,
-                                             List<GenericRecord> deletes, Schema deleteRowSchema) throws IOException {
-        EqualityDeleteWriter<GenericRecord> writer = Parquet.writeDeletes(out)
-                .forTable(table)
-                .withPartition(partition)
-                .rowSchema(deleteRowSchema)
-                .createWriterFunc(GenericParquetWriter::buildWriter)
-                .overwrite()
-                .equalityFieldIds(deleteRowSchema.columns().stream().mapToInt(Types.NestedField::fieldId).toArray())
-                .buildEqualityWriter();
-
-        try (Closeable toClose = writer) {
-            writer.deleteAll(deletes);
-        }
-        return writer.toDeleteFile();
     }
 
     static List<GenericRecord> mockInsertData() {

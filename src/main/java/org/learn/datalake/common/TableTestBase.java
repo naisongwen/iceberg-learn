@@ -30,6 +30,7 @@ import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.deletes.EqualityDeleteWriter;
+import org.apache.iceberg.deletes.PositionDeleteWriter;
 import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.hadoop.HadoopTables;
 import org.apache.iceberg.io.*;
@@ -94,92 +95,6 @@ public class TableTestBase {
             .bucket("data", 16)
             .build();
 
-    static final DataFile FILE_A = DataFiles.builder(SPEC)
-            .withPath("data-a.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=0") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-
-    static final DataFile FILE_B = DataFiles.builder(SPEC)
-            .withPath("data-b.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=1") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-
-    static final DataFile FILE_A2 = DataFiles.builder(SPEC)
-            .withPath("/path/to/data-a-2.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=0") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-    static final DeleteFile FILE_A_DELETES = FileMetadata.deleteFileBuilder(SPEC)
-            .ofPositionDeletes()
-            .withPath("/path/to/data-a-deletes.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=0") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-    // Equality delete files.
-    static final DeleteFile FILE_A2_DELETES = FileMetadata.deleteFileBuilder(SPEC)
-            .ofEqualityDeletes(3)
-            .withPath("/path/to/data-a2-deletes.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=0")
-            .withRecordCount(1)
-            .build();
-    static final DeleteFile FILE_B_DELETES = FileMetadata.deleteFileBuilder(SPEC)
-            .ofPositionDeletes()
-            .withPath("/path/to/data-b-deletes.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=1") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-    static final DataFile FILE_C = DataFiles.builder(SPEC)
-            .withPath("data-c.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=2") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-    static final DataFile FILE_D = DataFiles.builder(SPEC)
-            .withPath("/path/to/data-d.parquet")
-            .withFileSizeInBytes(10)
-            .withPartitionPath("data_bucket=3") // easy way to set partition data for now
-            .withRecordCount(1)
-            .build();
-
-    static final DataFile FILE_WITH_STATS = DataFiles.builder(SPEC)
-            .withPath("/path/to/data-with-stats.parquet")
-            .withMetrics(new Metrics(10L,
-                    ImmutableMap.of(3, 100L, 4, 200L), // column sizes
-                    ImmutableMap.of(3, 90L, 4, 180L), // value counts
-                    ImmutableMap.of(3, 10L, 4, 20L), // null value counts
-                    ImmutableMap.of(3, 0L, 4, 0L), // nan value counts
-                    ImmutableMap.of(3, Conversions.toByteBuffer(Types.IntegerType.get(), 1),
-                            4, Conversions.toByteBuffer(Types.IntegerType.get(), 2)),  // lower bounds
-                    ImmutableMap.of(3, Conversions.toByteBuffer(Types.IntegerType.get(), 5),
-                            4, Conversions.toByteBuffer(Types.IntegerType.get(), 10))  // upperbounds
-            ))
-            .withFileSizeInBytes(350)
-            .build();
-
-    static Iterator<Long> seqs(long... seqs) {
-        return LongStream.of(seqs).iterator();
-    }
-
-    static Iterator<Long> ids(Long... ids) {
-        return Iterators.forArray(ids);
-    }
-
-    static Iterator<DataFile> files(DataFile... files) {
-        return Iterators.forArray(files);
-    }
-
-    static Iterator<DeleteFile> files(DeleteFile... files) {
-        return Iterators.forArray(files);
-    }
-
     protected static final int formatVersion=2;
 
     //private TestTables.TestTable table = null;
@@ -224,9 +139,6 @@ public class TableTestBase {
         return TestTables.create(tableDir, "test", schema, spec, formatVersion);
     }
 
-    TestTables.TestTable load() {
-        return TestTables.load(tableDir, "test");
-    }
 
    static TestTables.LocalFileIO FILE_IO=new TestTables.LocalFileIO();
     public static ManifestFile writeManifest(Long snapshotId, Table table,File manifestFile, DataFile... files) throws IOException {
@@ -274,7 +186,7 @@ public class TableTestBase {
     }
 
     void validateSnapshot(Snapshot old, Snapshot snap, long sequenceNumber, DataFile... newFiles) {
-        validateSnapshot(old, snap, (Long) sequenceNumber, newFiles);
+        validateSnapshot(old, snap, sequenceNumber, newFiles);
     }
 
     void validateTableFiles(Table tbl, DataFile... expectedFiles) {
@@ -350,20 +262,46 @@ public class TableTestBase {
                 .build();
     }
 
-    protected static DeleteFile writeDeleteFile(Table table, OutputFile out, StructLike partition,
-                                             List<GenericRecord> deletes, Schema deleteRowSchema) throws IOException {
-        EqualityDeleteWriter<GenericRecord> writer = Parquet.writeDeletes(out)
+    public static DeleteFile equalityDelete(Table table, File out, StructLike partition,
+                                            List<GenericRecord> deletes) throws IOException {
+        EqualityDeleteWriter<GenericRecord> writer = Parquet.writeDeletes(org.apache.iceberg.Files.localOutput(out))
                 .forTable(table)
                 .withPartition(partition)
-                .rowSchema(deleteRowSchema)
+                .rowSchema(table.schema())
                 .createWriterFunc(GenericParquetWriter::buildWriter)
                 .overwrite()
-                .equalityFieldIds(deleteRowSchema.columns().stream().mapToInt(Types.NestedField::fieldId).toArray())
+                .equalityFieldIds(table.schema().columns().stream().mapToInt(Types.NestedField::fieldId).toArray())
                 .buildEqualityWriter();
 
         try (Closeable toClose = writer) {
             writer.deleteAll(deletes);
         }
         return writer.toDeleteFile();
+    }
+
+    protected static DeleteFile posDelete(Table table, List<GenericRecord> positions, File add, File out) throws IOException {
+        PositionDeleteWriter<GenericRecord> deleteWriter = Parquet.writeDeletes(org.apache.iceberg.Files.localOutput(out))
+                .createWriterFunc(GenericParquetWriter::buildWriter)
+                .overwrite()
+                .rowSchema(table.schema())
+                .withSpec(PartitionSpec.unpartitioned())
+                .buildPositionWriter();
+
+        String deletePath = add.getAbsolutePath();
+        try (PositionDeleteWriter<GenericRecord> writer = deleteWriter) {
+            long pos=0L;
+            for (GenericRecord record:positions) {
+                //根据行号删除所在行
+                writer.delete(deletePath, pos, record);
+                pos++;
+            }
+        }
+
+        DeleteFile deleteFile = deleteWriter.toDeleteFile();
+        Assert.assertEquals("Format should be Parquet", FileFormat.PARQUET, deleteFile.format());
+        Assert.assertEquals("Should be position deletes", FileContent.POSITION_DELETES, deleteFile.content());
+        Assert.assertEquals("Partition should be empty", 0, deleteFile.partition().size());
+        Assert.assertNull("Key metadata should be null", deleteFile.keyMetadata());
+        return  deleteFile;
     }
 }

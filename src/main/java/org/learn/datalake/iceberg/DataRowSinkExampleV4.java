@@ -35,13 +35,13 @@ public class DataRowSinkExampleV4 extends ExampleBase {
 
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSourceWithoutCK<>(
                         row("+I", 1, "aaa"),
-                        row("+U", 1, "bbb")
+                        row("+I", 2, "bbb")
                 ), ROW_TYPE_INFO)
                 .setParallelism(1)//NOTE:ensure the order
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(SimpleDataUtil.ROW_TYPE))
                 .setParallelism(1);
 
-        File warehouse = new File("warehouse/test_upsert_file_V4");
+        File warehouse = new File("warehouse/test_sink_V4");
         Table table = getTableOrCreate(warehouse, true);
         //dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));
 

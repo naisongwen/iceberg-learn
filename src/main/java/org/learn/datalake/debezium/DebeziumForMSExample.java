@@ -135,7 +135,7 @@ public class DebeziumForMSExample {
         }
     }
 
-    public static void main(String args[]) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         DebeziumForMSExample debeziumExample = new DebeziumForMSExample();
         debeziumExample.start();
     }

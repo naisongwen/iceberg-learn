@@ -134,7 +134,7 @@ public class DebeziumForMysqlExample {
         }
     }
 
-    public static void main(String args[]) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         DebeziumForMysqlExample debeziumExample = new DebeziumForMysqlExample();
         debeziumExample.start();
     }

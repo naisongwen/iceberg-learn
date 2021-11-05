@@ -1,27 +1,22 @@
 package org.learn.datalake.metadata;
 
 import com.google.common.collect.Iterables;
-import org.apache.iceberg.*;
-import org.apache.iceberg.actions.RewriteDataFilesActionResult;
+import org.apache.iceberg.DataFile;
+import org.apache.iceberg.FileScanTask;
+import org.apache.iceberg.Schema;
+import org.apache.iceberg.Table;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
-import org.apache.iceberg.data.parquet.GenericParquetWriter;
-import org.apache.iceberg.flink.actions.Actions;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.io.FileAppender;
-import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.types.Types;
 import org.learn.datalake.common.TableTestBase;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.apache.iceberg.Files.localInput;
 
 //Reference SchemaEvolutionTest
 public class AddFileOpsExample extends TableTestBase {

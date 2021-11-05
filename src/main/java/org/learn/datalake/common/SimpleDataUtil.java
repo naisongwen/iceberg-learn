@@ -64,7 +64,7 @@ public class SimpleDataUtil {
   }
 
   public static final Schema SCHEMA = new Schema(
-          Types.NestedField.required(1, "id", Types.IntegerType.get()),
+          Types.NestedField.optional(1, "id", Types.IntegerType.get()),
           Types.NestedField.optional(2, "data", Types.StringType.get())
   );
 
