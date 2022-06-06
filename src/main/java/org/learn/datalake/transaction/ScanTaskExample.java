@@ -1,4 +1,4 @@
-package org.learn.datalake.metadata;
+package org.learn.datalake.transaction;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
@@ -10,11 +10,11 @@ import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.FileAppender;
 import org.apache.iceberg.relocated.com.google.common.collect.Iterables;
 import org.junit.Assert;
+import org.learn.datalake.common.SimpleDataUtil;
 import org.learn.datalake.common.TableTestBase;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class ScanTaskExample extends TableTestBase {
@@ -25,7 +25,6 @@ public class ScanTaskExample extends TableTestBase {
             FileUtils.cleanDirectory(tabDir);
         tabDir.mkdirs();
         ScanTaskExample manifestExample = new ScanTaskExample();
-        manifestExample.setupTable(tabDir);
         manifestExample.testFileScan();
     }
 
@@ -36,7 +35,7 @@ public class ScanTaskExample extends TableTestBase {
 //        record1.setField("age", 13);
 //        record1.setField("ts", LocalDateTime.parse("2003-01-01T00:01:00"));
         List<GenericRecord> records = Lists.newArrayList(record1);
-        Table table = getTableOrCreate(new File("warehouse/test_scan"),true);
+        Table table = getTableOrCreate(new File("warehouse/test_scan"), SimpleDataUtil.SCHEMA,true);
         String location1 = table.location().replace("file:", "") + "/data/file1.avro";
 
         try (FileAppender<GenericRecord> writer = Avro.write(Files.localOutput(location1))

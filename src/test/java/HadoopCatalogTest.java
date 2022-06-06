@@ -1,5 +1,3 @@
-package org.learn.datalake.catalog;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.PartitionSpec;
@@ -20,7 +18,7 @@ import java.util.Set;
 import static org.apache.iceberg.types.Types.NestedField.required;
 
 //Reference TestHadoopCatalog
-public class HadoopCatalogExample {
+public class HadoopCatalogTest {
     static final Schema SCHEMA = new Schema(
             required(3, "id", Types.IntegerType.get(), "unique ID"),
             required(4, "data", Types.StringType.get())

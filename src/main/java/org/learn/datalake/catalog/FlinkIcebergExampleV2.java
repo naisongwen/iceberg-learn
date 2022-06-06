@@ -11,9 +11,6 @@ import java.util.Map;
 
 public class FlinkIcebergExampleV2 extends ExampleBase {
 
-    private static final String THRIFT_URI = "thrift://hw-node5:9083";
-    //    private static final String THRIFT_URI = "thrift://localhost:50938";
-
     static String toWithClause(Map<String, String> props) {
         StringBuilder builder = new StringBuilder();
         builder.append("(");
@@ -38,25 +35,33 @@ public class FlinkIcebergExampleV2 extends ExampleBase {
      * */
 
     public static void main(String[] args) {
+        //String thriftUri = "thrift://10.201.0.203:9083";
+        String thriftUri="thrift://localhost:54259";
+        String  warehouse="hdfs://10.201.0.82:9000/dlink_test/catalogmanager/test/";
+        String catalog="test_catalog_1";
+        String table="test_table_1";
+        warehouse=new File("warehouse",table).getAbsolutePath();
         Map<String, String> properties = new HashMap<>();
         properties.put("type", "iceberg");
         properties.put("property-version", "1");
-        //properties.put("warehouse", parameterTool.get("warehouse"));
-        properties.put(CatalogProperties.URI, THRIFT_URI);
+        properties.put("warehouse",warehouse);
+        properties.put(CatalogProperties.URI, thriftUri);
         properties.put("catalog-type", "hive");
         // Set the 'hive-conf-dir' instead of 'warehouse'
-        properties.put(FlinkCatalogFactory.HIVE_CONF_DIR, new File("src\\main\\resources").getAbsolutePath());
+//        properties.put(FlinkCatalogFactory.HIVE_CONF_DIR, new File("src/main/resources").getAbsolutePath());
 
         FlinkIcebergExampleV2 flinkIcebergExampleV2=new FlinkIcebergExampleV2();
-        List<Object[]> resultList=flinkIcebergExampleV2.sql("CREATE CATALOG test_catalog WITH %s",toWithClause(properties));
-        System.out.println(resultList);
-        flinkIcebergExampleV2.sql("USE CATALOG test_catalog");
+        flinkIcebergExampleV2.sql(String.format("CREATE CATALOG %s WITH %s",catalog,toWithClause(properties)));
+        flinkIcebergExampleV2.sql(String.format("USE CATALOG %s",catalog));
 
         flinkIcebergExampleV2.sql("CREATE DATABASE IF not EXISTS test_db");
         flinkIcebergExampleV2.sql("USE test_db");
-        flinkIcebergExampleV2.sql("CREATE TABLE IF not EXISTS test_table(c1 INT, c2 STRING)");
-        flinkIcebergExampleV2.sql("INSERT INTO test_table SELECT 1, 'a'");
-        flinkIcebergExampleV2.sql("DROP TABLE IF EXISTS test_table");
+        flinkIcebergExampleV2.sql(String.format("CREATE TABLE IF not EXISTS %s(c1 INT, c2 STRING) with('engine.hive.enabled'='true')",table));
+        flinkIcebergExampleV2.sql(String.format("INSERT INTO %s values(1, 'a')",table));
+        List<Object[]> resultList=flinkIcebergExampleV2.sql(String.format("select * from test_table_2",table));
+        System.out.println(resultList);
+
+        flinkIcebergExampleV2.sql(String.format("DROP TABLE IF EXISTS %s",table));
         flinkIcebergExampleV2.sql("DROP DATABASE IF EXISTS test_db");
     }
 }

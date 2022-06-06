@@ -40,21 +40,22 @@ public class DataRowSinkExampleV2 extends ExampleBase {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();
         checkpointConfig.setCheckpointInterval(100L);
-        env.setParallelism(1);
+//        env.setParallelism(1);
         TypeInformation<Row> ROW_TYPE_INFO = new RowTypeInfo(
                 SimpleDataUtil.FLINK_SCHEMA.getFieldTypes());
 
         List<List<Row>> elementsPerCheckpoint = ImmutableList.of(
                 // Checkpoint #1
                 ImmutableList.of(
-                        row("+I", 1, "aaa"),
-                        row("+I", 1, "bbb")
-                )
+                        row("+I", 1, "aaa")
+//                        row("+U", 1, "ccc")
+                ),
                 // Checkpoint #2
                 //在不同事务中更新需要-U
-//                ImmutableList.of(
-//                        row("+I", 1, "bbb")
-//                )
+                ImmutableList.of(
+                        row("-U", 1, "aaa"),
+                        row("+U", 1, "bbb")
+                )
 //                // Checkpoint #3
 //                ImmutableList.of(
 //                        row("-D", 1, "aaa"),
@@ -87,7 +88,7 @@ public class DataRowSinkExampleV2 extends ExampleBase {
         Table table;
         if (catalog.tableExists(tableIdentifier))
             table = catalog.loadTable(tableIdentifier);
-        else table = SimpleDataUtil.createTable(warehouseDir.getAbsolutePath(), properties, false);
+        else table = SimpleDataUtil.createTable(warehouseDir.getAbsolutePath(), SimpleDataUtil.SCHEMA, properties, false);
 
         TableLoader tableLoader = TableLoader.fromHadoopTable(warehouseDir.getAbsolutePath());
 

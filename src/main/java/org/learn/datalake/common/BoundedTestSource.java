@@ -58,7 +58,7 @@ public final class BoundedTestSource<T> implements SourceFunction<T>, Checkpoint
     }
 
     @Override
-    public void run(SourceContext<T> ctx) throws Exception {
+    public void run(SourceContext<T> ctx) throws InterruptedException {
         for (int checkpoint = 0; checkpoint < elementsPerCheckpoint.size(); checkpoint++) {
 
             final int checkpointToAwait;

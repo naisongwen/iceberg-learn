@@ -51,7 +51,7 @@ public class DeleteFileOpsExample extends TableTestBase {
         TableMetadata metadata = operations.current();
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));
         table.newRowDelta()
-//                .addRows(dataFile)
+                .addRows(dataFile)
                 .addDeletes(deleteFile)
                 .commit();
 

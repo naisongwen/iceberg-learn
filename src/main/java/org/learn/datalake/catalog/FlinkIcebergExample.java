@@ -1,6 +1,5 @@
 package org.learn.datalake.catalog;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.iceberg.Table;

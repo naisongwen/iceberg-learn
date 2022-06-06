@@ -25,8 +25,6 @@ import java.util.List;
 
 import static org.learn.datalake.common.TableTestBase.getTableOrCreate;
 
-//https://github.com/ververica/flink-cdc-connectors
-
 public class DataRowSinkExampleV3 extends ExampleBase {
 
     public static void main(String[] args) throws Exception {
@@ -50,12 +48,13 @@ public class DataRowSinkExampleV3 extends ExampleBase {
         List<List<Row>> elementsPerCheckpoint = ImmutableList.of(
                 // Checkpoint #1
                 ImmutableList.of(
-                        row("+I", 1,  "aaa"),
+                        row("-U", 1,  "aaa"),
                         row("+U", 1,  "bbb")
                 )
                 // Checkpoint #2
 //                ImmutableList.of(
-//                        row("-D", 1, "aaa")
+//                        row("-U", 1,  "bbb"),
+//                        row("+U", 1,  "ccc")
 //                )
 //                // Checkpoint #3
 //                ImmutableList.of(
@@ -81,9 +80,8 @@ public class DataRowSinkExampleV3 extends ExampleBase {
 //                Row.of(RowKind.INSERT,3, "foo")), ROW_TYPE_INFO)
 //                .map(CONVERTER::toInternal, RowDataTypeInfo.of(SimpleDataUtil.ROW_TYPE));
 
-
         File warehouse = new File("warehouse/test_sink_V3");
-        Table table = getTableOrCreate(warehouse,true);
+        Table table = getTableOrCreate(warehouse,SimpleDataUtil.SCHEMA,true);
 
         //dataStream = dataStream.keyBy((KeySelector) value -> ((RowData)value).getInt(0));
         TableOperations operations = ((BaseTable) table).operations();
@@ -102,14 +100,6 @@ public class DataRowSinkExampleV3 extends ExampleBase {
         env.execute("Test Iceberg DataStream");
 
         table.refresh();
-        for (Snapshot snapshot : table.snapshots()) {
-            long snapshotId = snapshot.snapshotId();
-            try (CloseableIterable<Record> reader = IcebergGenerics.read(table)
-                    .useSnapshot(snapshotId)
-                    .select("*")
-                    .build()) {
-                reader.forEach(System.out::print);
-            }
-        }
+        printTableData(table);
     }
 }

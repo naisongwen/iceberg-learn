@@ -1,5 +1,7 @@
 package org.learn.datalake.common;
 
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.TableResult;
@@ -7,6 +9,11 @@ import org.apache.flink.table.data.util.DataFormatConverters;
 import org.apache.flink.types.Row;
 import org.apache.flink.types.RowKind;
 import org.apache.flink.util.CloseableIterator;
+import org.apache.iceberg.Table;
+import org.apache.iceberg.data.IcebergGenerics;
+import org.apache.iceberg.data.Record;
+import org.apache.iceberg.io.CloseableIterable;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 
 import java.util.List;
@@ -16,7 +23,7 @@ import java.util.stream.IntStream;
 
 public abstract class ExampleBase {
 
-    protected static final Map<String, RowKind> ROW_KIND_MAP = org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap.of(
+    protected static final Map<String, RowKind> ROW_KIND_MAP = ImmutableMap.of(
             "+I", RowKind.INSERT,
             "-D", RowKind.DELETE,
             "-U", RowKind.UPDATE_BEFORE,
@@ -36,17 +43,24 @@ public abstract class ExampleBase {
 
     private volatile TableEnvironment tEnv = null;
 
+    public static final ConfigOption<Boolean> TABLE_EXEC_ICEBERG_INFER_SOURCE_PARALLELISM =
+            ConfigOptions.key("table.exec.iceberg.infer-source-parallelism")
+                    .booleanType()
+                    .defaultValue(true)
+                    .withDescription("If is false, parallelism of source are set by config.\n" +
+                            "If is true, source parallelism is inferred according to splits number.\n");
+
     protected TableEnvironment getTableEnv() {
         if (tEnv == null) {
             synchronized (this) {
                 if (tEnv == null) {
                     EnvironmentSettings settings = EnvironmentSettings
                             .newInstance()
-                            .useBlinkPlanner()
-                            .inBatchMode()
+                            .inStreamingMode()
                             .build();
 
                     TableEnvironment env = TableEnvironment.create(settings);
+                    env.getConfig().getConfiguration().set(TABLE_EXEC_ICEBERG_INFER_SOURCE_PARALLELISM, false);
                     tEnv = env;
                 }
             }
@@ -84,5 +98,12 @@ public abstract class ExampleBase {
         }
 
         return results;
+    }
+
+    protected static void printTableData(Table table){
+        CloseableIterable<Record> iterable = IcebergGenerics.read(table).build();
+        String data = com.google.common.collect.Iterables.toString(iterable);
+        System.out.println("data in table "+table.name());
+        System.out.println(data);
     }
 }

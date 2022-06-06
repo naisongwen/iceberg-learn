@@ -67,10 +67,10 @@ public class DataRowSinkExampleV1 {
             System.exit(-1);
         }
 
-        FileFormat format=FileFormat.valueOf("avro".toUpperCase(Locale.ENGLISH));
+        FileFormat format=FileFormat.valueOf("orc".toUpperCase(Locale.ENGLISH));
         Map<String, String> props = ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, format.name());
 
-        Table table = SimpleDataUtil.createTable(tablePath, props, false);
+        Table table = SimpleDataUtil.createTable(tablePath,SimpleDataUtil.SCHEMA, props, false);
 
         try {
             TableLoader tableLoader = TableLoader.fromHadoopTable(tablePath);

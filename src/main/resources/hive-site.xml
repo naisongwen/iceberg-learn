@@ -19,43 +19,27 @@
 
 <configuration>
 
-    <property>
-        <name>hive.metastore.schema.verification</name>
-        <value>false</value>
-    </property>
-    <property>
-        <name>datanucleus.schema.validateTables</name>
-        <value>false</value>
-        <description>validates existing schema against code. turn this on if you want to verify existing schema
-        </description>
-    </property>
-    <property>
-        <name>hive.metastore.client.capability.check</name>
-        <value>false</value>
-    </property>
+	<property>
+		<name>hive.metastore.schema.verification</name>
+		<value>false</value>
+	</property>
+	<property>
+		<name>datanucleus.schema.validateTables</name>
+		<value>false</value>
+		<description>validates existing schema against code. turn this on if you want to verify existing schema</description>
+	</property>
+	<property>
+		<name>hive.metastore.client.capability.check</name>
+		<value>false</value>
+	</property>
 
-    <property>
-        <name>datanucleus.schema.autoCreateTables</name>
-        <value>true</value>
-    </property>
+	<property>
+		<name>datanucleus.schema.autoCreateTables</name>
+		<value>true</value>
+	</property>
 
-    <property>
-        <name>datanucleus.schema.autoCreateAll</name>
-        <value>true</value>
-    </property>
-<!--    <property>-->
-<!--        <name>hive.metastore.warehouse.dir</name>-->
-<!--        <value>file:/C:/Users/wns/Documents/workplace/datalake-learn/warehouse</value>-->
-<!--        <description>location of default database for the warehouse</description>-->
-<!--    </property>-->
-
-    <property>
-        <name>hive.server2.enable.doAs</name>
-        <value>false</value>
-        <description>
-            hive.server2.enable.doAs设置成false则，
-            yarn作业获取到的hiveserver2用户都为hive用户。
-            设置成true则为实际的用户名
-        </description>
-    </property>
+	<property>
+		<name>datanucleus.schema.autoCreateAll</name>
+		<value>true</value>
+	</property>
 </configuration>

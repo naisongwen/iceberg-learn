@@ -23,8 +23,6 @@ import java.io.File;
 
 import static org.learn.datalake.common.TableTestBase.getTableOrCreate;
 
-//https://github.com/ververica/flink-cdc-connectors
-
 public class DataRowSinkExampleV4 extends ExampleBase {
 
     public static void main(String[] args) throws Exception {
@@ -35,9 +33,9 @@ public class DataRowSinkExampleV4 extends ExampleBase {
 
         DataStream<RowData> dataStream = env.addSource(new BoundedTestSourceWithoutCK<>(
                         row("+I", 1, "aaa"),
-                        row("+I", 2, "bbb")
+                        row("+U", 1, "bbb")
                 ), ROW_TYPE_INFO)
-                .setParallelism(1)//NOTE:ensure the order
+//                .setParallelism(1)//NOTE:ensure the order
                 .map(CONVERTER::toInternal, FlinkCompatibilityUtil.toTypeInfo(SimpleDataUtil.ROW_TYPE))
                 .setParallelism(1);
 

@@ -30,7 +30,6 @@ import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
-import org.apache.iceberg.types.Types;
 import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
@@ -40,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 //Reference iceberg HadoopTableTestBase
-public class CatalogSinkExample extends ExampleBase {
+public class DataRowSinkExample extends ExampleBase {
     //--warehouse warehouse/hive_db/hive_table -hive_db hive_db --hive_table hive_table --catalog_type hive
     public static void main(String[] args) throws Exception {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
@@ -92,7 +91,7 @@ public class CatalogSinkExample extends ExampleBase {
             String HIVE_CATALOG = "iceberg_hive_catalog";
             catalogLoader = CatalogLoader.hive(HIVE_CATALOG, new Configuration(), properties);
 
-            HiveConf hiveConf = new HiveConf(new Configuration(), CatalogSinkExample.class);
+            HiveConf hiveConf = new HiveConf(new Configuration(), DataRowSinkExample.class);
 
             hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, thriftUri);
             hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "file:" + warehouseDir);

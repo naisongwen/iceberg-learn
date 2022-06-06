@@ -77,14 +77,17 @@ public class SimpleDataUtil {
 
   public static final Record RECORD = GenericRecord.create(SCHEMA);
 
-  public static Table createTable(String path, Map<String, String> properties, boolean partitioned) {
+  public static Table createTable(String path,Map<String, String> properties, boolean partitioned) {
+      return createTable(path,SCHEMA,properties,partitioned);
+  }
+  public static Table createTable(String path,Schema schema,Map<String, String> properties, boolean partitioned) {
     PartitionSpec spec;
     if (partitioned) {
-      spec = PartitionSpec.builderFor(SCHEMA).identity("data").build();
+      spec = PartitionSpec.builderFor(schema).build();
     } else {
       spec = PartitionSpec.unpartitioned();
     }
-    return new HadoopTables().create(SCHEMA, spec, properties, path);
+    return new HadoopTables().create(schema, spec, properties, path);
   }
 
   public static Record createRecord(Integer id, String data) {
