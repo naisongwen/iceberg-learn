@@ -14,9 +14,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <hadoop.version>3.3.2</hadoop.version>
         <hive.version>3.1.2</hive.version>
-        <iceberg.version>0.12.1</iceberg.version>
+        <iceberg.version>0.13.2</iceberg.version>
         <debezium.version>1.4.1.Final</debezium.version>
-        <flink.version>1.12.4</flink.version>
+        <flink.version>1.14.4</flink.version>
         <scala.binary.version>2.11</scala.binary.version>
         <target.java.version>1.8</target.java.version>
 <!--        <maven.compiler.source>${target.java.version}</maven.compiler.source>-->
@@ -58,13 +58,7 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-runtime-blink_${scala.binary.version}</artifactId>
+            <artifactId>flink-table-runtime_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
 
@@ -82,9 +76,15 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
+            <artifactId>flink-runtime</artifactId>
             <version>${flink.version}</version>
         </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.apache.flink</groupId>-->
+<!--            <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>-->
+<!--            <version>${flink.version}</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -95,14 +95,6 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-streaming-java_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-            <scope>test</scope>
-            <classifier>tests</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
             <scope>test</scope>
             <classifier>tests</classifier>
@@ -152,13 +144,11 @@
             <version>${debezium.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>org.apache.iceberg</groupId>
-            <artifactId>iceberg-flink</artifactId>
+            <artifactId>iceberg-flink-1.14</artifactId>
             <version>${iceberg.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.iceberg/iceberg-api -->
         <dependency>
             <groupId>org.apache.iceberg</groupId>
             <artifactId>iceberg-api</artifactId>
@@ -172,6 +162,11 @@
         <dependency>
             <groupId>org.apache.iceberg</groupId>
             <artifactId>iceberg-data</artifactId>
+            <version>${iceberg.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.iceberg</groupId>
+            <artifactId>iceberg-hive-metastore</artifactId>
             <version>${iceberg.version}</version>
         </dependency>
 
@@ -202,7 +197,7 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-aws</artifactId>
-            <version>3.3.2-dlink-3</version>
+            <version>${hadoop.version}</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>
