@@ -1,5 +1,7 @@
 package org.learn.datalake.common;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -13,8 +15,6 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,7 @@ public abstract class ExampleBase {
     protected static DataFormatConverters.RowConverter CONVERTER = new DataFormatConverters.RowConverter(
             SimpleDataUtil.FLINK_SCHEMA.getFieldDataTypes());
 
-    private volatile TableEnvironment tEnv = null;
+    private static  volatile TableEnvironment tEnv = null;
 
     public static final ConfigOption<Boolean> TABLE_EXEC_ICEBERG_INFER_SOURCE_PARALLELISM =
             ConfigOptions.key("table.exec.iceberg.infer-source-parallelism")
@@ -50,13 +50,13 @@ public abstract class ExampleBase {
                     .withDescription("If is false, parallelism of source are set by config.\n" +
                             "If is true, source parallelism is inferred according to splits number.\n");
 
-    protected TableEnvironment getTableEnv() {
+    protected static TableEnvironment getTableEnv() {
         if (tEnv == null) {
-            synchronized (this) {
+            synchronized (ExampleBase.class) {
                 if (tEnv == null) {
                     EnvironmentSettings settings = EnvironmentSettings
                             .newInstance()
-                            .inStreamingMode()
+                            .inBatchMode()
                             .build();
 
                     TableEnvironment env = TableEnvironment.create(settings);
@@ -72,11 +72,11 @@ public abstract class ExampleBase {
         return env.executeSql(String.format(query, args));
     }
 
-    protected TableResult exec(String query, Object... args) {
+    protected static TableResult exec(String query, Object... args) {
         return exec(getTableEnv(), query, args);
     }
 
-    protected List<Object[]> sql(String query, Object... args) {
+    protected static List<Object[]> sql(String query, Object... args) {
         TableResult tableResult = exec(query, args);
 
         tableResult.getJobClient().ifPresent(c -> {

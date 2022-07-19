@@ -1,20 +1,14 @@
 package org.learn.datalake.transaction;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.iceberg.*;
-import org.apache.iceberg.data.GenericRecord;
-import org.apache.iceberg.data.IcebergGenerics;
-import org.apache.iceberg.data.Record;
-import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
-import org.apache.iceberg.relocated.com.google.common.collect.Sets;
-import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.junit.Assert;
 import org.learn.datalake.common.TableTestBase;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -105,7 +99,7 @@ public class TransactionExampleV2 extends TableTestBase {
     }
 
     private static List<String> filesToScan(TableScan tableScan) {
-        Iterable<String> filesToRead = org.apache.iceberg.relocated.com.google.common.collect.Iterables.transform(tableScan.planFiles(), t -> {
+        Iterable<String> filesToRead = Iterables.transform(tableScan.planFiles(), t -> {
             String path = t.file().path().toString();
             return path.split("\\.")[0];
         });

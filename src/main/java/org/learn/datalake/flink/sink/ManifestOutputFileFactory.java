@@ -19,11 +19,11 @@
 
 package org.learn.datalake.flink.sink;
 
+import com.google.common.base.Strings;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.TableOperations;
 import org.apache.iceberg.io.FileIO;
 import org.apache.iceberg.io.OutputFile;
-import org.apache.iceberg.relocated.com.google.common.base.Strings;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;

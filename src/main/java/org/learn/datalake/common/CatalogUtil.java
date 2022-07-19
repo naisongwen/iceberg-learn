@@ -1,5 +1,6 @@
 package org.learn.datalake.common;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.Schema;
@@ -8,7 +9,6 @@ import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.Catalog;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.flink.CatalogLoader;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

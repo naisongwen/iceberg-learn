@@ -1,5 +1,6 @@
 package org.learn.datalake.transaction;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import org.apache.commons.io.FileUtils;
 import org.apache.iceberg.*;
@@ -8,7 +9,6 @@ import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.avro.DataWriter;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.FileAppender;
-import org.apache.iceberg.relocated.com.google.common.collect.Iterables;
 import org.junit.Assert;
 import org.learn.datalake.common.SimpleDataUtil;
 import org.learn.datalake.common.TableTestBase;

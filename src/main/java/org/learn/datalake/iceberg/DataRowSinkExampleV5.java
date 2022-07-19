@@ -1,5 +1,6 @@
 package org.learn.datalake.iceberg;
 
+import com.google.common.collect.ImmutableList;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -9,26 +10,12 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.data.RowData;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.CloseableIterator;
-import org.apache.iceberg.*;
-import org.apache.iceberg.data.IcebergGenerics;
-import org.apache.iceberg.data.Record;
-import org.apache.iceberg.flink.TableLoader;
-import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
-import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import static org.learn.datalake.common.TableTestBase.getTableOrCreate;
 
 public class DataRowSinkExampleV5 extends ExampleBase {
 

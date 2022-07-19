@@ -1,6 +1,6 @@
 package org.learn.datalake.common;
 
-import org.apache.iceberg.relocated.com.google.common.collect.Maps;
+import com.google.common.collect.Maps;
 import org.apache.kafka.common.TopicPartition;
 
 import java.io.Serializable;

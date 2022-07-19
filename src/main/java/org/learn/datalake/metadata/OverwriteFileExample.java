@@ -1,13 +1,13 @@
 package org.learn.datalake.metadata;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Streams;
 import org.apache.iceberg.*;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
-import org.apache.iceberg.relocated.com.google.common.collect.Streams;
 import org.learn.datalake.common.TableTestBase;
 
 import java.io.File;

@@ -64,7 +64,6 @@ public class HadoopCatalogForMinIOExample {
     hiveConf.set("datanucleus.schema.autoCreateTables","true");
     hiveConf.set("datanucleus.schema.autoCreateAll","true");
     String thriftUri="thrift://master:9083";
-    HiveCatalog hiveCatalog = new HiveCatalog(hiveConf);
     TableIdentifier tbl2 = TableIdentifier.of("default", "tbl_4");
     Map<String, String> properties = new HashMap<>();
     properties.put("type", "iceberg");

@@ -27,20 +27,13 @@ public class FlinkIcebergExampleV2 extends ExampleBase {
         return builder.toString();
     }
 
-    /**
-     * /var/log/hadoop-hdfs/hadoop-cmf-hdfs-NAMENODE*.log.out
-     *  org.apache.hadoop.security.ShellBasedUnixGroupsMapping: unable to return groups for user wns
-     * PartialGroupNameException The user name 'wns' is not found. id: wns: no such user wns
-     * //如果修改登录账户名称，设置环境变量：HADOOP_USER_NAME=hdfs
-     * */
 
-    public static void main(String[] args) {
-        //String thriftUri = "thrift://10.201.0.203:9083";
-        String thriftUri="thrift://localhost:54259";
-        String  warehouse="hdfs://10.201.0.82:9000/dlink_test/catalogmanager/test/";
+    public static void start() {
+        String thriftUri="thrift://10.201.0.212:49153";
+        String  warehouse="hdfs://10.201.0.82:9000/cjtest/catalogmanager/";
         String catalog="test_catalog_1";
         String table="test_table_1";
-        warehouse=new File("warehouse",table).getAbsolutePath();
+//        warehouse=new File("warehouse",table).getAbsolutePath();
         Map<String, String> properties = new HashMap<>();
         properties.put("type", "iceberg");
         properties.put("property-version", "1");
@@ -50,18 +43,29 @@ public class FlinkIcebergExampleV2 extends ExampleBase {
         // Set the 'hive-conf-dir' instead of 'warehouse'
 //        properties.put(FlinkCatalogFactory.HIVE_CONF_DIR, new File("src/main/resources").getAbsolutePath());
 
-        FlinkIcebergExampleV2 flinkIcebergExampleV2=new FlinkIcebergExampleV2();
-        flinkIcebergExampleV2.sql(String.format("CREATE CATALOG %s WITH %s",catalog,toWithClause(properties)));
-        flinkIcebergExampleV2.sql(String.format("USE CATALOG %s",catalog));
+        sql(String.format("CREATE CATALOG %s WITH %s",catalog,toWithClause(properties)));
+        sql(String.format("USE CATALOG %s",catalog));
 
-        flinkIcebergExampleV2.sql("CREATE DATABASE IF not EXISTS test_db");
-        flinkIcebergExampleV2.sql("USE test_db");
-        flinkIcebergExampleV2.sql(String.format("CREATE TABLE IF not EXISTS %s(c1 INT, c2 STRING) with('engine.hive.enabled'='true')",table));
-        flinkIcebergExampleV2.sql(String.format("INSERT INTO %s values(1, 'a')",table));
-        List<Object[]> resultList=flinkIcebergExampleV2.sql(String.format("select * from test_table_2",table));
+        sql("CREATE DATABASE IF not EXISTS test_db");
+        sql("USE test_db");
+        sql(String.format("CREATE TABLE IF not EXISTS %s(c1 INT, c2 STRING) with('engine.hive.enabled'='true')",table));
+        sql(String.format("INSERT INTO %s values(1, 'a')",table));
+        List<Object[]> resultList=sql(String.format("select * from %s",table));
         System.out.println(resultList);
 
-        flinkIcebergExampleV2.sql(String.format("DROP TABLE IF EXISTS %s",table));
-        flinkIcebergExampleV2.sql("DROP DATABASE IF EXISTS test_db");
+        sql(String.format("DROP TABLE IF EXISTS %s",table));
+        sql("DROP DATABASE IF EXISTS test_db");
+
+    }
+
+    /**
+     * /var/log/hadoop-hdfs/hadoop-cmf-hdfs-NAMENODE*.log.out
+     *  org.apache.hadoop.security.ShellBasedUnixGroupsMapping: unable to return groups for user wns
+     * PartialGroupNameException The user name 'wns' is not found. id: wns: no such user wns
+     * //如果修改登录账户名称，设置环境变量：HADOOP_USER_NAME=hdfs
+     * */
+
+    public static void main(String[] args) {
+        start();
     }
 }

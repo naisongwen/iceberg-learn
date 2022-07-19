@@ -1,5 +1,6 @@
 package org.learn.datalake.iceberg;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -29,7 +30,6 @@ import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
@@ -71,8 +71,9 @@ public class DataRowSinkExample extends ExampleBase {
         properties.put("property-version", "1");
         File warehouseBase = new File(parameterTool.get("warehouse"));
         File tableDir = new File(parameterTool.get("warehouse")+File.separator+parameterTool.get("hive_db")+File.separator+parameterTool.get("hive_table"));
-        if (tableDir.exists())
+        if (tableDir.exists()) {
             FileUtils.cleanDirectory(tableDir);
+        }
         tableDir.mkdirs();
         String warehouseDir = warehouseBase.getAbsolutePath();
         properties.put("warehouse", warehouseBase.getAbsolutePath());
@@ -95,7 +96,6 @@ public class DataRowSinkExample extends ExampleBase {
 
             hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, thriftUri);
             hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "file:" + warehouseDir);
-            HiveCatalog catalog = new HiveCatalog(hiveConf);
             HiveMetaStoreClient metastoreClient = new HiveMetaStoreClient(hiveConf);
 
             String dbPath = new File(warehouseDir, parameterTool.get("hive_db") + ".db").getPath();

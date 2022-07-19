@@ -1,5 +1,6 @@
 package org.learn.datalake.iceberg;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import org.apache.commons.io.FileUtils;
@@ -20,7 +21,6 @@ import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.learn.datalake.common.BoundedTestSource;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;

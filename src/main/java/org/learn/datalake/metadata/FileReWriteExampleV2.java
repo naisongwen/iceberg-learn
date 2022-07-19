@@ -1,8 +1,8 @@
 package org.learn.datalake.metadata;
 
+import com.google.common.collect.Lists;
 import org.apache.iceberg.*;
 import org.apache.iceberg.data.GenericRecord;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.junit.Assert;
 import org.learn.datalake.common.TableTestBase;
 

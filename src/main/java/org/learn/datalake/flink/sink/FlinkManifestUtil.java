@@ -19,12 +19,12 @@
 
 package org.learn.datalake.flink.sink;
 
+import com.google.common.collect.Lists;
 import org.apache.iceberg.*;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.FileIO;
 import org.apache.iceberg.io.OutputFile;
 import org.apache.iceberg.io.WriteResult;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 
 import java.io.IOException;
 import java.util.List;

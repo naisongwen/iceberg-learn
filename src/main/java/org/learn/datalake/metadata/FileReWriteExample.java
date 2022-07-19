@@ -1,9 +1,9 @@
 package org.learn.datalake.metadata;
 
+import com.google.common.collect.Lists;
 import org.apache.iceberg.*;
 import org.apache.iceberg.data.GenericRecord;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.learn.datalake.common.TableTestBase;
 import org.mockito.internal.util.collections.Sets;
 

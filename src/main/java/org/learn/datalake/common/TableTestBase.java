@@ -19,6 +19,10 @@
 
 package org.learn.datalake.common;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.iceberg.*;
@@ -32,21 +36,13 @@ import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.deletes.EqualityDeleteWriter;
 import org.apache.iceberg.deletes.PositionDeleteWriter;
 import org.apache.iceberg.flink.CatalogLoader;
-import org.apache.iceberg.hadoop.HadoopTables;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.io.CloseableIterator;
 import org.apache.iceberg.io.FileAppender;
 import org.apache.iceberg.io.OutputFile;
 import org.apache.iceberg.parquet.Parquet;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
-import org.apache.iceberg.relocated.com.google.common.collect.Sets;
-import org.apache.iceberg.relocated.com.google.common.collect.Streams;
-import org.apache.iceberg.relocated.com.google.common.io.Files;
 import org.apache.iceberg.types.Types;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.learn.datalake.metadata.TestTables;
 
 import java.io.Closeable;
@@ -264,7 +260,7 @@ public class TableTestBase {
 
     List<File> listManifestFiles(File tableDirToList) {
         return Lists.newArrayList(new File(tableDirToList, "metadata").listFiles((dir, name) ->
-                !name.startsWith("snap") && Files.getFileExtension(name).equalsIgnoreCase("avro")));
+                !name.startsWith("snap") && com.google.common.io.Files.getFileExtension(name).equalsIgnoreCase("avro")));
     }
 
     protected TestTables.TestTable create(Schema schema, PartitionSpec spec) {

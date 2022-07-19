@@ -1,5 +1,6 @@
 package org.learn.datalake.iceberg;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -14,7 +15,6 @@ import org.apache.iceberg.flink.TableLoader;
 import org.apache.iceberg.flink.sink.FlinkSink;
 import org.apache.iceberg.flink.util.FlinkCompatibilityUtil;
 import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.relocated.com.google.common.collect.ImmutableList;
 import org.learn.datalake.common.BoundedTestSourceWithoutCK;
 import org.learn.datalake.common.ExampleBase;
 import org.learn.datalake.common.SimpleDataUtil;
