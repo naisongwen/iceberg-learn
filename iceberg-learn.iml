@@ -64,6 +64,7 @@
     <orderEntry type="library" name="Maven: org.javassist:javassist:3.24.0-GA" level="project" />
     <orderEntry type="library" name="Maven: org.xerial.snappy:snappy-java:1.1.8.3" level="project" />
     <orderEntry type="library" name="Maven: org.lz4:lz4-java:1.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-hive_2.12:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-kafka_2.11:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-base:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.kafka:kafka-clients:2.4.1" level="project" />
