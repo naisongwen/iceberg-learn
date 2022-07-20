@@ -24,8 +24,8 @@ import java.util.Map;
 public class CatalogFederal {
     private static String warehousePath = "hdfs://10.201.1.128:9000/user/hive/warehouse";
     private static String hiveMetastoreURI = "thrift://10.201.1.128:9083";
-    private static String targetWarehousePath = "hdfs://10.0.30.12:9000/user/hive/warehouse";
-    private static String targetHiveMetastoreURI = "thrift://10.0.30.12:9083";
+    private static String targetWarehousePath = "hdfs://10.201.0.82:9000/cjtest/catalogmanager";
+    private static String targetHiveMetastoreURI = "thrift://10.201.0.212:49153";
 
     private static String catalogMappingName="spark_catalog";
     private static String targetCatalogMappingName="spark_catalog_2";
@@ -40,7 +40,7 @@ public class CatalogFederal {
                 .set("spark.sql.catalog." + catalogMappingName + ".default-namespace", "default")
                 .set("spark.sql.catalog." + catalogMappingName + ".uri",targetHiveMetastoreURI)
 
-                .set("spark.sql.catalog." + targetCatalogMappingName, "org.apache.iceberg.spark.SparkSessionCatalog")
+                .set("spark.sql.catalog." + targetCatalogMappingName, "org.apache.iceberg.spark.SparkCatalog")
                 .set("spark.sql.catalog." + targetCatalogMappingName + ".type", "hive")
                 .set("spark.sql.catalog." + targetCatalogMappingName + ".default-namespace", "iceberg_db")
                 .set("spark.sql.catalog." + targetCatalogMappingName + ".uri",targetHiveMetastoreURI)
