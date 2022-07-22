@@ -1,3 +1,4 @@
+import com.google.common.collect.Maps;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -10,8 +11,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.iceberg.FileFormat;
 import org.apache.iceberg.TableProperties;
+import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.flink.CatalogLoader;
+import org.apache.iceberg.flink.FlinkCatalog;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.learn.datalake.common.SimpleDataUtil;
@@ -27,7 +30,7 @@ public class TestIcebergHiveCatalog {
     private static final String uri = String.format("thrift://%s:9083", primaryHost);
 
     @Test
-    public void testCreateIcebergTable() throws DatabaseAlreadyExistException {
+    public void testCreateHiveMappingTable() throws DatabaseAlreadyExistException {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
         env.setParallelism(1);
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
@@ -48,12 +51,12 @@ public class TestIcebergHiveCatalog {
         tableEnvironment.registerCatalog(hiveCatalog.getName(),hiveCatalog);
         Map<String, String> map = new HashMap<>();
         map.put("test", "test");
-        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(map, "test");
-        hiveCatalog.createDatabase( "test_database", catalogDatabase,true);
-        tableEnvironment.useCatalog(hiveCatalog.getName());
-        tableEnvironment.useDatabase("test_database");
-        String tblName="test_iceberg_table_12";
-//        tableEnvironment.executeSql(String.format("drop table %s",tblName));
+        String tblName="test_iceberg_table_14";
+//        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(map, "test");
+//        hiveCatalog.createDatabase( "test_database", catalogDatabase,true);
+//        tableEnvironment.useCatalog(hiveCatalog.getName());
+//        tableEnvironment.useDatabase("test_database");
+        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
         String sql= String.format("CREATE TABLE %s(" +
                 "     cnt BIGINT,\n" +
                 "     id INT\n" +
@@ -62,13 +65,57 @@ public class TestIcebergHiveCatalog {
                 "               'uri' = '%s',\n" +
                 "                'catalog-name'='%s',\n" +
                 "                'catalog-type'='hive',\n" +
-                "                'table_type'='iceberg',\n" +
+                "                'is_generic' = 'false',\n" +
+                "                'catalog-database' = '%s',\n" +
+                "                'catalog-table' = '%s',\n" +
                 "                'warehouse'='%s'\n" +
-                              ")",tblName,hmsUri,hiveCatalog.getName(),"s3a://faas-ethan/");
+                              ")",tblName,hmsUri,hiveCatalog.getName(),"hive_db",tblName,"s3a://faas-ethan/hive_db/");
         tableEnvironment.executeSql(sql);
         tableEnvironment.executeSql(String.format("insert into %s values(1,1)",tblName));
         tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
         hiveCatalog.close();
+    }
+
+    @Test
+    public void testCreateHiveIcebergTable() throws DatabaseAlreadyExistException {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
+        env.setParallelism(1);
+        EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
+                .build();
+        StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
+        Configuration hiveConf=new Configuration();
+        String hmsUri="thrift://10.201.0.212:49153";
+        hiveConf.set("hive.metastore.uris", hmsUri);
+        hiveConf.set("hive.metastore.warehouse.dir", "s3a://faas-ethan/");
+        hiveConf.set("metastore.catalog.default", "hive");
+        hiveConf.set("hive.metastore.client.capability.check", "false");
+        hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
+        hiveConf.set("fs.s3a.access.key", "admin1234");
+        hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
+        hiveConf.set("fs.s3a.secret.key", "admin1234");
+        hiveConf.set("fs.s3a.endpoint", "http://10.201.0.212:32000");
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("test", "test");
+        CatalogLoader catalogLoader=CatalogLoader.hive("hive", hiveConf, properties);
+        FlinkCatalog flinkCatalog=new FlinkCatalog("test_catalog_name","test_db", Namespace.empty(),catalogLoader,false);
+        flinkCatalog.open();
+        tableEnvironment.registerCatalog(flinkCatalog.getName(),flinkCatalog);
+        tableEnvironment.useCatalog(flinkCatalog.getName());
+        String tblName="test_iceberg_table_15";
+        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(Maps.newHashMap(), "test_database");
+        flinkCatalog.createDatabase( "test_database", catalogDatabase,true);
+        tableEnvironment.useDatabase("test_database");
+        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
+        String sql= String.format("CREATE TABLE %s(" +
+                "     id BIGINT COMMENT 'unique id'," +
+                "      data STRING" +
+                "     ) WITH (" +
+                ")",tblName);
+        tableEnvironment.executeSql(sql);
+        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
+        tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
+        flinkCatalog.close();
     }
 
     @Test
