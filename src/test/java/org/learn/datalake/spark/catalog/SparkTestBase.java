@@ -58,15 +58,14 @@ public abstract class SparkTestBase {
     @BeforeClass
     public static void startSpark() {
         hiveConf=new HiveConf();
-        String hmsUri="thrift://10.201.0.212:49153";
-        hiveConf.set("hive.metastore.uris", hmsUri);
-        hiveConf.set("metastore.catalog.default", "default_catalog_5");
-        // 当前版本2.3.4与集群3.0版本不兼容，加入此设置
-        hiveConf.set("hive.metastore.client.capability.check", "false");
+        String hmsUri="thrift://10.201.0.212:49164";
+//        hiveConf.set("metastore.catalog.default", "default_catalog_5");
         SparkTestBase.spark = SparkSession.builder()
                 .master("local[2]")
                 .config(SQLConf.PARTITION_OVERWRITE_MODE().key(), "dynamic")
-                .config("spark.hadoop." + METASTOREURIS.varname, hiveConf.get(METASTOREURIS.varname))
+                .config("spark.hadoop." + METASTOREURIS.varname, hmsUri)
+                .config("spark.hadoop.hive.metastore.warehouse.dir", "s3a://faas-ethan/")
+                .config("spark.sql.warehouse.dir", "s3a://faas-ethan/")
                 .enableHiveSupport()
                 .getOrCreate();
 

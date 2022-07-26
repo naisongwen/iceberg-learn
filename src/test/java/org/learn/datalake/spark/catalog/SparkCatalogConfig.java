@@ -27,6 +27,7 @@ import org.apache.iceberg.spark.SparkSessionCatalog;
 public enum SparkCatalogConfig {
     HIVE("testhive", SparkCatalog.class.getName(), ImmutableMap.of(
             "type", "hive",
+            "warehouse", "s3a://faas-ethan",
             "default-namespace", "default"
     )),
     HADOOP("testhadoop", SparkCatalog.class.getName(), ImmutableMap.of(
