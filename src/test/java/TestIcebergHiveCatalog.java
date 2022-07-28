@@ -37,7 +37,7 @@ public class TestIcebergHiveCatalog {
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
         HiveConf hiveConf=new HiveConf();
-        String hmsUri="thrift://10.201.0.212:49153";
+        String hmsUri="thrift://localhost:9083";
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("metastore.catalog.default", "hive");
         hiveConf.set("hive.metastore.client.capability.check", "false");
@@ -51,27 +51,31 @@ public class TestIcebergHiveCatalog {
         tableEnvironment.registerCatalog(hiveCatalog.getName(),hiveCatalog);
         Map<String, String> map = new HashMap<>();
         map.put("test", "test");
-        String tblName="test_iceberg_table_14";
+        String tblName="test_iceberg_table_2";
 //        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(map, "test");
 //        hiveCatalog.createDatabase( "test_database", catalogDatabase,true);
 //        tableEnvironment.useCatalog(hiveCatalog.getName());
 //        tableEnvironment.useDatabase("test_database");
         tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
         String sql= String.format("CREATE TABLE %s(" +
-                "     cnt BIGINT,\n" +
-                "     id INT\n" +
+                "     id INT,\n" +
+                "     data string,\n" +
+                "      primary key(id) not enforced\n" +
                 "     ) WITH (" +
                 "               'connector' = 'iceberg',\n" +
-                "               'uri' = '%s',\n" +
+                "                'format-version' = '2',\n" +
+                "                'engine.hive.enabled' = 'true',\n" +
+                "                'write.upsert.enabled' = 'true',\n" +
+                "                'uri' = '%s',\n" +
                 "                'catalog-name'='%s',\n" +
                 "                'catalog-type'='hive',\n" +
                 "                'is_generic' = 'false',\n" +
                 "                'catalog-database' = '%s',\n" +
                 "                'catalog-table' = '%s',\n" +
                 "                'warehouse'='%s'\n" +
-                              ")",tblName,hmsUri,hiveCatalog.getName(),"hive_db",tblName,"s3a://faas-ethan/hive_db/");
+                              ")",tblName,hmsUri,hiveCatalog.getName(),"default",tblName,"s3a://faas-ethan/hive_db/");
         tableEnvironment.executeSql(sql);
-        tableEnvironment.executeSql(String.format("insert into %s values(1,1)",tblName));
+        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
         tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
         hiveCatalog.close();
     }
@@ -84,7 +88,7 @@ public class TestIcebergHiveCatalog {
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
         Configuration hiveConf=new Configuration();
-        String hmsUri="thrift://10.201.0.212:49153";
+        String hmsUri="thrift://localhost:9083";
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("hive.metastore.warehouse.dir", "s3a://faas-ethan/");
         hiveConf.set("metastore.catalog.default", "hive");
@@ -109,7 +113,7 @@ public class TestIcebergHiveCatalog {
         tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
         String sql= String.format("CREATE TABLE %s(" +
                 "     id BIGINT COMMENT 'unique id'," +
-                "      data STRING" +
+                "     data STRING" +
                 "     ) WITH (" +
                 ")",tblName);
         tableEnvironment.executeSql(sql);
