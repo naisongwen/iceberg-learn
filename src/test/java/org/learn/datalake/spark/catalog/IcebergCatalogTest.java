@@ -67,34 +67,6 @@ public class IcebergCatalogTest {
     }
 
     @Test
-    public void testHdfsHA() {
-        Configuration conf = new Configuration();
-        String catalogName = "a_mapping_1128";
-        String thriftUri = "thrift://10.201.0.212:49166";
-        conf.set("metastore.catalog.default", catalogName);
-        conf.set("dfs.nameservices", "cjtest");
-        conf.set("dfs.ha.namenodes.cjtest", "nn1,nn2");
-        conf.set("dfs.namenode.rpc-address.cjtest.nn1", "10.201.0.82:9000");
-        conf.set("dfs.namenode.rpc-address.cjtest.nn2", "10.201.0.83:9000");
-        conf.set("dfs.namenode.http-address.cjtest.nn1", "10.201.0.82:50090");
-        conf.set("dfs.namenode.http-address.cjtest.nn2", "10.201.0.83:50090");
-        conf.set("dfs.client.failover.proxy.provider.cjtest", "org.apache.hadoop.hdfs.server.namenode.ha.ConfiguredFailoverProxyProvider");
-
-        String warehouseLocation = "hdfs://cjtest/cjtest/catalogmanager/";
-        warehouseLocation="file:///tmp/warehouse/";
-        HiveCatalog hiveCatalog = new HiveCatalog();
-        hiveCatalog.setConf(conf);
-        Map<String, String> properties = Maps.newHashMap();
-        properties.put("uri", thriftUri);
-        properties.put("warehouse", warehouseLocation);
-        hiveCatalog.initialize(catalogName, properties);
-        String dbName="test_db_3";
-        hiveCatalog.createNamespace(Namespace.of(dbName));
-        TableIdentifier tableIdentifier=TableIdentifier.of(Namespace.of(dbName),"test_tbl");
-        hiveCatalog.createTable(tableIdentifier,schema);
-    }
-
-    @Test
     public void testHadoopCatalog() {
         File warehouse = new File("warehouse");
         try {

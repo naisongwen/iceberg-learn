@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
-<!--
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?><!--
    Licensed to the Apache Software Foundation (ASF) under one or more
    contributor license agreements.  See the NOTICE file distributed with
    this work for additional information regarding copyright ownership.
@@ -16,35 +15,90 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 -->
-
+<!-- These are default values meant to allow easy smoke testing of the metastore.  You will
+likely need to add a number of new values. -->
 <configuration>
+  <property>
+    <name>metastore.task.threads.always</name>
+    <value>org.apache.hadoop.hive.metastore.events.EventCleanerTask</value>
+  </property>
+  <property>
+    <name>metastore.expression.proxy</name>
+    <value>org.apache.hadoop.hive.metastore.DefaultPartitionExpressionProxy</value>
+  </property>
+  <property>
+    <name>hive.metastore.schema.verification</name>
+    <value>false</value>
+  </property>
+  <property>
+    <name>datanucleus.schema.validateTables</name>
+    <value>false</value>
+    <description>validates existing schema against code. turn this on if you want to verify existing schema
+    </description>
+  </property>
+  <property>
+    <name>hive.metastore.client.capability.check</name>
+    <value>false</value>
+  </property>
 
-	<property>
-		<name>hive.metastore.schema.verification</name>
-		<value>false</value>
-	</property>
-	<property>
-		<name>datanucleus.schema.validateTables</name>
-		<value>false</value>
-		<description>validates existing schema against code. turn this on if you want to verify existing schema</description>
-	</property>
-	<property>
-		<name>hive.metastore.client.capability.check</name>
-		<value>false</value>
-	</property>
+  <property>
+    <name>datanucleus.schema.autoCreateTables</name>
+    <value>false</value>
+  </property>
 
-	<property>
-		<name>datanucleus.schema.autoCreateTables</name>
-		<value>true</value>
-	</property>
+  <property>
+    <name>datanucleus.schema.autoCreateAll</name>
+    <value>false</value>
+  </property>
 
-	<property>
-		<name>datanucleus.schema.autoCreateAll</name>
-		<value>true</value>
-	</property>
+<!--  <property>-->
+<!--    <name>javax.jdo.option.ConnectionURL</name>-->
+<!--    <value>jdbc:postgresql://10.201.0.212:36127/test1</value>-->
+<!--  </property>-->
 
-	<property>
-		<name>hive.metastore.warehouse.dir</name>
-		<value>/Users/deepexi/workplace/hive-learn/warehouse/</value>
-	</property>
+<!--  <property>-->
+<!--    <name>javax.jdo.option.ConnectionDriverName</name>-->
+<!--    <value>org.postgresql.Driver</value>-->
+<!--  </property>-->
+
+<!--  <property>-->
+<!--    <name>javax.jdo.option.ConnectionUserName</name>-->
+<!--    <value>postgres</value>-->
+<!--  </property>-->
+
+<!--  <property>-->
+<!--    <name>javax.jdo.option.ConnectionPassword</name>-->
+<!--    <value>deepexi2022pg</value>-->
+<!--  </property>-->
+
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.cj.jdbc.Driver</value>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://10.201.0.205:3306/hivemetastore_db_dev_212</value>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>root</value>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value>123456</value>
+  </property>
+
+  <property>
+    <name>hive.metastore.warehouse.dir</name>
+    <value>/Users/deepexi/workplace/hive-learn/warehouse/</value>
+  </property>
+
+  <property>
+    <name>metastore.thrift.uris</name>
+    <value>thrift://localhost:9083</value>
+    <description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.</description>
+  </property>
 </configuration>

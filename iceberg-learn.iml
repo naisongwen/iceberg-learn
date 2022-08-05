@@ -43,10 +43,10 @@
     <orderEntry type="library" name="Maven: com.esotericsoftware:kryo-shaded:4.0.2" level="project" />
     <orderEntry type="library" name="Maven: com.esotericsoftware:minlog:1.3.0" level="project" />
     <orderEntry type="library" name="Maven: com.twitter:chill-java:0.10.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-client-api:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-client-runtime:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-launcher_2.12:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-kvstore_2.12:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-all:1.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-network-common_2.12:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.crypto.tink:tink:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-network-shuffle_2.12:3.2.0" level="project" />
@@ -158,11 +158,13 @@
     <orderEntry type="library" name="Maven: org.apache.hive:hive-llap-common:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hive:hive-llap-client:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.10.10" level="project" />
     <orderEntry type="library" name="Maven: org.jodd:jodd-core:3.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-core:4.1.17" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.12.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libfb303:0.9.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.derby:derby:10.14.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.iceberg:iceberg-api:0.13.2" level="project" />
@@ -178,33 +180,10 @@
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.parquet:parquet-avro:1.12.2" level="project" />
     <orderEntry type="library" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-core:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-yarn-client:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-client:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-client:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-common:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty.websocket:websocket-api:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-yarn-api:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.jline:jline:3.9.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-yarn-common:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.jersey:jersey-client:1.19" level="project" />
-    <orderEntry type="library" name="Maven: com.google.inject:guice:4.0" level="project" />
-    <orderEntry type="library" name="Maven: javax.inject:javax.inject:1" level="project" />
-    <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
-    <orderEntry type="library" name="Maven: com.sun.jersey.contribs:jersey-guice:1.19" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.10.5" level="project" />
-    <orderEntry type="library" name="Maven: jakarta.xml.bind:jakarta.xml.bind-api:2.3.2" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.10.5" level="project" />
-    <orderEntry type="library" name="Maven: com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.10.5" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-hdfs-client:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okhttp:okhttp:2.7.5" level="project" />
-    <orderEntry type="library" name="Maven: com.squareup.okio:okio:1.6.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.5.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-annotations:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.inject.extensions:guice-servlet:4.0" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty:3.10.6.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-client-api:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-common:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop.thirdparty:hadoop-shaded-protobuf_3_7:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-annotations:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop.thirdparty:hadoop-shaded-guava:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:27.0-jre" level="project" />
     <orderEntry type="library" name="Maven: com.google.guava:failureaccess:1.0" level="project" />
@@ -213,13 +192,14 @@
     <orderEntry type="library" name="Maven: org.codehaus.mojo:animal-sniffer-annotations:1.17" level="project" />
     <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.2" level="project" />
     <orderEntry type="library" name="Maven: javax.servlet:javax.servlet-api:3.1.0" level="project" />
-    <orderEntry type="library" name="Maven: jakarta.activation:jakarta.activation-api:1.2.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: jakarta.activation:jakarta.activation-api:1.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-server:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-http:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-io:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.4.40.v20210413" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.4.40.v20210413" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.servlet.jsp:jsp-api:2.1" level="project" />
@@ -236,6 +216,7 @@
     <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-configuration2:2.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.re2j:re2j:1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.5.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-auth:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: com.nimbusds:nimbus-jose-jwt:9.8.1" level="project" />
@@ -265,15 +246,10 @@
     <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:4.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.woodstox:woodstox-core:5.3.0" level="project" />
     <orderEntry type="library" name="Maven: dnsjava:dnsjava:2.1.7" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-hdfs:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: commons-daemon:commons-daemon:1.0.13" level="project" />
-    <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-all:1.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-aws:3.3.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.wildfly.openssl:wildfly-openssl:1.0.7.Final" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-bundle:1.11.1026" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.1" level="project" />
+    <orderEntry type="library" name="Maven: mysql:mysql-connector-java:8.0.19" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:3.7.7" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.10.19" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.10.19" level="project" />
