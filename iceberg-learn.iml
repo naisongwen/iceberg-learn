@@ -47,6 +47,7 @@
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-client-runtime:3.3.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-launcher_2.12:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-kvstore_2.12:3.2.0" level="project" />
+    <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-all:1.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-network-common_2.12:3.2.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.crypto.tink:tink:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-network-shuffle_2.12:3.2.0" level="project" />
@@ -220,6 +221,7 @@
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-servlet:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-security:9.4.40.v20210413" level="project" />
+    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-webapp:9.4.40.v20210413" level="project" />
     <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-xml:9.4.40.v20210413" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: javax.servlet.jsp:jsp-api:2.1" level="project" />
@@ -265,10 +267,7 @@
     <orderEntry type="library" name="Maven: org.codehaus.woodstox:stax2-api:4.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.woodstox:woodstox-core:5.3.0" level="project" />
     <orderEntry type="library" name="Maven: dnsjava:dnsjava:2.1.7" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-hdfs:3.3.1" level="project" />
-    <orderEntry type="library" name="Maven: org.eclipse.jetty:jetty-util-ajax:9.4.40.v20210413" level="project" />
-    <orderEntry type="library" name="Maven: commons-daemon:commons-daemon:1.0.13" level="project" />
-    <orderEntry type="library" name="Maven: org.fusesource.leveldbjni:leveldbjni-all:1.8" level="project" />
+    <orderEntry type="library" name="Maven: mysql:mysql-connector-java:8.0.19" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-aws:3.3.1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.wildfly.openssl:wildfly-openssl:1.0.7.Final" level="project" />
     <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-bundle:1.11.1026" level="project" />

@@ -26,7 +26,8 @@
 	<property>
 		<name>datanucleus.schema.validateTables</name>
 		<value>false</value>
-		<description>validates existing schema against code. turn this on if you want to verify existing schema</description>
+		<description>validates existing schema against code. turn this on if you want to verify existing schema
+		</description>
 	</property>
 	<property>
 		<name>hive.metastore.client.capability.check</name>
@@ -35,16 +36,86 @@
 
 	<property>
 		<name>datanucleus.schema.autoCreateTables</name>
-		<value>true</value>
+		<value>false</value>
 	</property>
 
 	<property>
 		<name>datanucleus.schema.autoCreateAll</name>
+		<value>false</value>
+	</property>
+
+	<property>
+		<name>hive.execution.engine</name>
+		<value>mr</value>
+	</property>
+
+	<property>
+		<name>fs.s3a.impl</name>
+		<value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
+		<description>The implementation class of the S3A Filesystem</description>
+	</property>
+
+	<property>
+		<name>fs.s3a.connection.ssl.enabled</name>
+		<value>false</value>
+	</property>
+
+	<property>
+		<name>fs.s3a.access.key</name>
+		<value>admin1234</value>
+		<description>AWS access key ID.
+			Omit for IAM role-based or provider-based authentication.
+		</description>
+	</property>
+
+	<property>
+		<name>fs.s3a.endpoint</name>
+		<value>http://10.201.0.212:32000</value>
+	</property>
+
+	<property>
+		<name>fs.s3a.path.style.access</name>
 		<value>true</value>
 	</property>
 
 	<property>
-		<name>hive.metastore.warehouse.dir</name>
-		<value>/Users/deepexi/workplace/hive-learn/warehouse/</value>
+		<name>fs.s3a.secret.key</name>
+		<value>admin1234</value>
+		<description>AWS secret key.
+			Omit for IAM role-based or provider-based authentication.
+		</description>
 	</property>
+
+	<property>
+		<name>javax.jdo.option.ConnectionDriverName</name>
+		<value>com.mysql.cj.jdbc.Driver</value>
+	</property>
+
+	<property>
+		<name>javax.jdo.option.ConnectionURL</name>
+		<value>jdbc:mysql://10.201.0.212:49165/hivemetastore_v211</value>
+	</property>
+
+	<property>
+		<name>javax.jdo.option.ConnectionUserName</name>
+		<value>root</value>
+	</property>
+
+	<property>
+		<name>javax.jdo.option.ConnectionPassword</name>
+		<value>123456</value>
+	</property>
+
+	<property>
+		<name>hive.metastore.warehouse.dir</name>
+		<value>/Users/deepexi/workplace/iceberg-learn/warehouse/</value>
+	</property>
+
+	<property>
+		<name>metastore.thrift.uris</name>
+		<value>thrift://localhost:9083</value>
+		<description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.
+		</description>
+	</property>
+
 </configuration>
