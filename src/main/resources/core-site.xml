@@ -22,32 +22,32 @@
 		<value>org.apache.hadoop.fs.s3a.S3AFileSystem</value>
 		<description>The implementation class of the S3A Filesystem</description>
 	</property>
-<!--	<property>-->
-<!--		<name>fs.s3a.access.key</name>-->
-<!--		<value>admin1234</value>-->
-<!--		<description>AWS access key ID.-->
-<!--			Omit for IAM role-based or provider-based authentication.</description>-->
-<!--	</property>-->
+	<property>
+		<name>fs.s3a.access.key</name>
+		<value>admin1234</value>
+		<description>AWS access key ID.
+			Omit for IAM role-based or provider-based authentication.</description>
+	</property>
 
-<!--	<property>-->
-<!--		<name>fs.s3a.path.style.access</name>-->
-<!--		<value>true</value>-->
-<!--	</property>-->
+	<property>
+		<name>fs.s3a.path.style.access</name>
+		<value>true</value>
+	</property>
 
-<!--	<property>-->
-<!--		<name>fs.s3a.secret.key</name>-->
-<!--		<value>admin1234</value>-->
-<!--		<description>AWS secret key.-->
-<!--			Omit for IAM role-based or provider-based authentication.</description>-->
-<!--	</property>-->
-<!--	<property>-->
-<!--		<name>fs.s3a.endpoint</name>-->
-<!--		<value>http://10.201.0.212:32000</value>-->
-<!--		<description>AWS S3 endpoint to connect to. An up-to-date list is-->
-<!--			provided in the AWS Documentation: regions and endpoints. Without this-->
-<!--			property, the standard region (s3.amazonaws.com) is assumed.-->
-<!--		</description>-->
-<!--	</property>-->
+	<property>
+		<name>fs.s3a.secret.key</name>
+		<value>admin1234</value>
+		<description>AWS secret key.
+			Omit for IAM role-based or provider-based authentication.</description>
+	</property>
+	<property>
+		<name>fs.s3a.endpoint</name>
+		<value>http://10.201.0.212:32000</value>
+		<description>AWS S3 endpoint to connect to. An up-to-date list is
+			provided in the AWS Documentation: regions and endpoints. Without this
+			property, the standard region (s3.amazonaws.com) is assumed.
+		</description>
+	</property>
 
 	<property>
 		<name>fs.s3a.endpoint.region</name>

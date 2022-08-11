@@ -67,9 +67,6 @@ public class HiveCatalogForMinIOExample {
     conf.set("fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider");
     String warehouse = "s3a://faas-ethan/iceberg/warehouse";
 
-    S3AFileSystem s3AFileSystem= (S3AFileSystem) S3AFileSystem.get(new URI(warehouse), conf);
-    s3AFileSystem.delete(new Path(warehouse),true);
-
     setupMetastoreDB("jdbc:derby:" + getMetastorePath() + ";create=true");
     HiveConf hiveConf = new HiveConf(conf, HiveCatalogForMinIOExample.class);
     String thriftUri="thrift://localhost:51066";

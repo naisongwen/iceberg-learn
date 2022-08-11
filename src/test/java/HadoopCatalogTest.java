@@ -6,7 +6,6 @@ import org.apache.iceberg.Table;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.hadoop.HadoopCatalog;
-import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 import org.apache.iceberg.types.Types;
 import org.junit.Assert;
@@ -20,8 +19,8 @@ import static org.apache.iceberg.types.Types.NestedField.required;
 //Reference TestHadoopCatalog
 public class HadoopCatalogTest {
     static final Schema SCHEMA = new Schema(
-            required(3, "id", Types.IntegerType.get(), "unique ID"),
-            required(4, "data", Types.StringType.get())
+            required(1, "id", Types.IntegerType.get(), "unique ID"),
+            required(2, "data", Types.StringType.get())
     );
 
     public static void main(String[] args) {
@@ -34,22 +33,17 @@ public class HadoopCatalogTest {
         }
         warehouse.mkdirs();
         String warehouseLocation = warehouse.getAbsolutePath();
-        System.out.println("warehouseLocation:" + warehouseLocation);
+        warehouseLocation = "s3a://faas-ethan/warehouse/";
         HadoopCatalog hadoopCatalog = new HadoopCatalog(conf, warehouseLocation);
 
-        TableIdentifier tbl1 = TableIdentifier.of("db", "tbl1");
-        TableIdentifier tbl2 = TableIdentifier.of("db", "tbl2");
-        TableIdentifier tbl3 = TableIdentifier.of("db", "ns1", "tbl3");
-        TableIdentifier tbl4 = TableIdentifier.of("db", "metadata", "metadata");
+        TableIdentifier tableIdentifier = TableIdentifier.of("default", "sample_hadoop_table_2");
 
-//        hadoopCatalog.listTables()
-        Lists.newArrayList(tbl1, tbl2, tbl3, tbl4).forEach(t ->
-                hadoopCatalog.buildTable(t, SCHEMA)
-                        .withPartitionSpec(PartitionSpec.unpartitioned())
-                        .create());
+        hadoopCatalog.buildTable(tableIdentifier, SCHEMA)
+                .withPartitionSpec(PartitionSpec.unpartitioned())
+                .create();
 
-        Table table = hadoopCatalog.loadTable(tbl1);
-        Schema  schema=table.schema();
+        Table table = hadoopCatalog.loadTable(tableIdentifier);
+        Schema schema = table.schema();
         List<TableIdentifier> tbls1 = hadoopCatalog.listTables(Namespace.of("db"));
         Set<String> tblSet = Sets.newHashSet(tbls1.stream().map(t -> t.name()).iterator());
         Assert.assertEquals(2, tblSet.size());
