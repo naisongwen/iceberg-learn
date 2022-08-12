@@ -36,7 +36,7 @@
 
 	<property>
 		<name>datanucleus.schema.autoCreateTables</name>
-		<value>false</value>
+		<value>true</value>
 	</property>
 
 	<property>
@@ -86,36 +86,36 @@
 		</description>
 	</property>
 
-	<property>
-		<name>javax.jdo.option.ConnectionDriverName</name>
-		<value>com.mysql.cj.jdbc.Driver</value>
-	</property>
+<!--	<property>-->
+<!--		<name>javax.jdo.option.ConnectionDriverName</name>-->
+<!--		<value>com.mysql.cj.jdbc.Driver</value>-->
+<!--	</property>-->
 
-	<property>
-		<name>javax.jdo.option.ConnectionURL</name>
-		<value>jdbc:mysql://10.201.0.212:49165/hivemetastore_v211</value>
-	</property>
+<!--	<property>-->
+<!--		<name>javax.jdo.option.ConnectionURL</name>-->
+<!--		<value>jdbc:mysql://10.201.0.212:49166/hivemetastore_v211</value>-->
+<!--	</property>-->
 
-	<property>
-		<name>javax.jdo.option.ConnectionUserName</name>
-		<value>root</value>
-	</property>
+<!--	<property>-->
+<!--		<name>javax.jdo.option.ConnectionUserName</name>-->
+<!--		<value>root</value>-->
+<!--	</property>-->
 
-	<property>
-		<name>javax.jdo.option.ConnectionPassword</name>
-		<value>123456</value>
-	</property>
+<!--	<property>-->
+<!--		<name>javax.jdo.option.ConnectionPassword</name>-->
+<!--		<value>123456</value>-->
+<!--	</property>-->
 
 	<property>
 		<name>hive.metastore.warehouse.dir</name>
-		<value>/Users/deepexi/workplace/iceberg-learn/warehouse/</value>
+		<value>s3a://faas-ethan/warehouse/</value>
 	</property>
 
-	<property>
-		<name>metastore.thrift.uris</name>
-		<value>thrift://localhost:9083</value>
-		<description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.
-		</description>
-	</property>
+<!--	<property>-->
+<!--		<name>metastore.thrift.uris</name>-->
+<!--		<value>thrift://localhost:9083</value>-->
+<!--		<description>Thrift URI for the remote metastore. Used by metastore client to connect to remote metastore.-->
+<!--		</description>-->
+<!--	</property>-->
 
 </configuration>

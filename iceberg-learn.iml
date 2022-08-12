@@ -159,11 +159,13 @@
     <orderEntry type="library" name="Maven: org.apache.hive:hive-llap-common:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hive:hive-llap-client:2.3.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.13" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.10.10" level="project" />
     <orderEntry type="library" name="Maven: org.jodd:jodd-core:3.5.2" level="project" />
     <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-core:4.1.17" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.12.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libfb303:0.9.3" level="project" />
     <orderEntry type="library" name="Maven: org.apache.derby:derby:10.14.2.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.iceberg:iceberg-api:0.13.2" level="project" />
@@ -269,10 +271,8 @@
     <orderEntry type="library" name="Maven: dnsjava:dnsjava:2.1.7" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:8.0.19" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-aws:3.3.1" level="project" />
+    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-bundle:1.11.901" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.wildfly.openssl:wildfly-openssl:1.0.7.Final" level="project" />
-    <orderEntry type="library" name="Maven: com.amazonaws:aws-java-sdk-bundle:1.11.1026" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.3" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.1" level="project" />
     <orderEntry type="library" name="Maven: org.mockito:mockito-core:3.7.7" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy:1.10.19" level="project" />
     <orderEntry type="library" name="Maven: net.bytebuddy:byte-buddy-agent:1.10.19" level="project" />

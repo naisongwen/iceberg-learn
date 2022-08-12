@@ -58,7 +58,9 @@ public abstract class SparkTestBase {
     @BeforeClass
     public static void startSpark() {
         hiveConf=new HiveConf();
-        String hmsUri="thrift://10.201.0.212:49164";
+        String hmsUri="thrift://10.201.0.212:49166";
+        hiveConf.set(METASTOREURIS.varname, hmsUri);
+
 //        hiveConf.set("metastore.catalog.default", "default_catalog_5");
         SparkTestBase.spark = SparkSession.builder()
                 .master("local[2]")
