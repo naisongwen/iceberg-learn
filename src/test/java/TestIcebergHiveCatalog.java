@@ -10,11 +10,16 @@ import org.apache.flink.table.catalog.hive.client.HiveShimLoader;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.iceberg.FileFormat;
+import org.apache.iceberg.Table;
 import org.apache.iceberg.TableProperties;
 import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
+import org.apache.iceberg.data.IcebergGenerics;
+import org.apache.iceberg.data.Record;
+import org.apache.iceberg.expressions.Expressions;
 import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.flink.FlinkCatalog;
+import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.learn.datalake.common.SimpleDataUtil;
@@ -24,20 +29,16 @@ import java.util.Locale;
 import java.util.Map;
 
 public class TestIcebergHiveCatalog {
-    private static final String primaryHost = "10.201.0.121";
-    private static final String warehouse = String.format("hdfs://%s:9003/user/hive/warehouse/iceberg/", primaryHost);
-    private static final String defaultFS = String.format("hdfs://%s:9003", primaryHost);
-    private static final String uri = String.format("thrift://%s:9083", primaryHost);
-
+    String hmsUri="thrift://10.201.0.212:49166";
     @Test
-    public void testCreateHiveMappingTable() throws DatabaseAlreadyExistException {
+    public void testCreateHiveMappingTable() {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
         env.setParallelism(1);
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
         HiveConf hiveConf=new HiveConf();
-        String hmsUri="thrift://localhost:9083";
+
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("metastore.catalog.default", "hive");
         hiveConf.set("hive.metastore.client.capability.check", "false");
@@ -51,7 +52,7 @@ public class TestIcebergHiveCatalog {
         tableEnvironment.registerCatalog(hiveCatalog.getName(),hiveCatalog);
         Map<String, String> map = new HashMap<>();
         map.put("test", "test");
-        String tblName="test_iceberg_table_2";
+        String tblName="test_iceberg_table_1";
 //        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(map, "test");
 //        hiveCatalog.createDatabase( "test_database", catalogDatabase,true);
 //        tableEnvironment.useCatalog(hiveCatalog.getName());
@@ -87,8 +88,7 @@ public class TestIcebergHiveCatalog {
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
-        Configuration hiveConf=new Configuration();
-        String hmsUri="thrift://localhost:9083";
+        HiveConf hiveConf=new HiveConf();
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("hive.metastore.warehouse.dir", "s3a://faas-ethan/");
         hiveConf.set("metastore.catalog.default", "hive");
@@ -106,7 +106,7 @@ public class TestIcebergHiveCatalog {
         flinkCatalog.open();
         tableEnvironment.registerCatalog(flinkCatalog.getName(),flinkCatalog);
         tableEnvironment.useCatalog(flinkCatalog.getName());
-        String tblName="test_iceberg_table_15";
+        String tblName="test_iceberg_table_2";
         CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(Maps.newHashMap(), "test_database");
         flinkCatalog.createDatabase( "test_database", catalogDatabase,true);
         tableEnvironment.useDatabase("test_database");
@@ -119,23 +119,24 @@ public class TestIcebergHiveCatalog {
         tableEnvironment.executeSql(sql);
         tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
         tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
+        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
         flinkCatalog.close();
     }
 
     @Test
-    public void testS3Table() {
+    public void testCreateTable() {
         CatalogLoader catalogLoader;
         FileFormat format = FileFormat.valueOf("avro".toUpperCase(Locale.ENGLISH));
         Map<String, String> properties = ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, format.name())
                 .of("type", "iceberg")
                 .of(TableProperties.FORMAT_VERSION, "1")
                 .of("catalog-type", "hive")
-                .of("warehouse", "s3a://wwwx")
+                .of("warehouse", "s3a://faas-ethan/warehouse")
                 .of("catalog-impl", "org.apache.iceberg.aws.glue.GlueCatalog")
                 .of("io-impl", "org.apache.iceberg.aws.s3.S3FileIO")
                 .of("lock-impl", "org.apache.iceberg.aws.glue.DynamoLockManager")
                 .of("lock.table", "myGlueLockTable")
-                .of("uri", uri);
+                .of("uri", hmsUri);
 
         Configuration cfg = new Configuration();
         String defaultFS = "hdfs://10.201.0.121:9003";
@@ -148,21 +149,26 @@ public class TestIcebergHiveCatalog {
     }
 
     @Test
-    public void testDropTable() {
+    public void testScanTable() {
         CatalogLoader catalogLoader;
         FileFormat format = FileFormat.valueOf("avro".toUpperCase(Locale.ENGLISH));
         Map<String, String> properties = ImmutableMap.of(TableProperties.DEFAULT_FILE_FORMAT, format.name())
                 .of("type", "iceberg")
                 .of(TableProperties.FORMAT_VERSION, "1")
                 .of("catalog-type", "hive")
-                .of("warehouse", warehouse)
+//                .of("warehouse", warehouse)
                 .of("hive-conf-dir", "/data5/flink/hive/conf/")
-                .of("uri", uri);
+                .of("uri", hmsUri);
 
         Configuration cfg = new Configuration();
         catalogLoader = CatalogLoader.hive("iceberg_default", cfg, properties);
-        TableIdentifier dataIdentifier = TableIdentifier.of("default", "iceberg_test_table2");
-        catalogLoader.loadCatalog().dropTable(dataIdentifier);
-        catalogLoader.loadCatalog().createTable(dataIdentifier, SimpleDataUtil.SCHEMA);
+        TableIdentifier dataIdentifier = TableIdentifier.of("test_database", "test_trino_iceberg_table");
+        Table table=catalogLoader.loadCatalog().loadTable(dataIdentifier);
+        CloseableIterable<Record> iterable = IcebergGenerics.read(table)
+//                .where(Expressions.equal("col_value","xxxxx"))
+                .build();
+        iterable.forEach(record -> {
+            System.out.println(record.toString());
+        });
     }
 }
