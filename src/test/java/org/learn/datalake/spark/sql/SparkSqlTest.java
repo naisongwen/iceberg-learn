@@ -1,6 +1,5 @@
 package org.learn.datalake.spark.sql;
 
-import com.google.common.collect.Maps;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.hive.HiveCatalog;
@@ -20,7 +19,7 @@ public class SparkSqlTest {
 
     @Test
     public void testInsert() {
-        String hmsUri = "thrift://localhost:9083";
+        String hmsUri = "thrift://10.201.0.212:39083";
         String warehouse="/Users/deepexi/workplace/hive-learn/warehouse/";
         SparkSession sparkSession = SparkSession.builder()
                 .master("local[2]")
