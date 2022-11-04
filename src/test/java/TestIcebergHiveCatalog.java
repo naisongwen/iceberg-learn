@@ -29,7 +29,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class TestIcebergHiveCatalog {
-    String hmsUri="thrift://10.201.0.212:49166";
+    String hmsUri="thrift://10.201.0.212:39083";
     @Test
     public void testCreateHiveMappingTable() {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
@@ -47,7 +47,7 @@ public class TestIcebergHiveCatalog {
         hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
         hiveConf.set("fs.s3a.secret.key", "admin1234");
         hiveConf.set("fs.s3a.endpoint", "http://10.201.0.212:32000");
-        HiveCatalog hiveCatalog=new HiveCatalog("test_catalog_name","test_db",hiveConf, HiveShimLoader.getHiveVersion());
+        HiveCatalog hiveCatalog=new HiveCatalog("test_catalog_name","default",hiveConf, HiveShimLoader.getHiveVersion());
         hiveCatalog.open();
         tableEnvironment.registerCatalog(hiveCatalog.getName(),hiveCatalog);
         Map<String, String> map = new HashMap<>();
@@ -74,7 +74,7 @@ public class TestIcebergHiveCatalog {
                 "                'catalog-database' = '%s',\n" +
                 "                'catalog-table' = '%s',\n" +
                 "                'warehouse'='%s'\n" +
-                              ")",tblName,hmsUri,hiveCatalog.getName(),"default",tblName,"s3a://faas-ethan/hive_db/");
+                              ")",tblName,hmsUri,hiveCatalog.getName(),"default",tblName,"s3a://test/hive_db/");
         tableEnvironment.executeSql(sql);
         tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
         tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
