@@ -18,7 +18,6 @@ public class TestQuery {
         env.setParallelism(1);
 
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance()
-                .useBlinkPlanner()
                 .inStreamingMode()
                 .build();
 

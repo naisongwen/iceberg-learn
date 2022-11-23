@@ -46,7 +46,7 @@ public class FileReWriteExampleV2 extends TableTestBase {
 
         printTableData(table);
         Snapshot baseSnap = table.currentSnapshot();
-        Assert.assertEquals("Should create 2 manifests for initial write", 2, baseSnap.allManifests().size());
+        Assert.assertEquals("Should create 2 manifests for initial write", 2, baseSnap.allManifests(table.io()).size());
         //printManifest(baseSnap);
 //        table.newRewrite()
 //                .rewriteFiles(Sets.newSet(dataFileA),Sets.newSet(deleteFileC),Sets.newSet(dataFileB),Sets.newSet(deleteFileD))

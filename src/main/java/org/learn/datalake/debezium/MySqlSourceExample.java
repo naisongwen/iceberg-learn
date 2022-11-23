@@ -113,13 +113,13 @@ public class MySqlSourceExample {
         TableOperations operations = ((BaseTable) table).operations();
         TableMetadata metadata = operations.current();
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));
-
-        FlinkSink.forRowData(streamSource)
-                .table(table)
-                .tableLoader(tableLoader)
-                .equalityFieldColumns(Arrays.asList("id"))
-                .writeParallelism(1)
-                .build();
+//
+//        FlinkSink.forRowData(streamSource)
+//                .table(table)
+//                .tableLoader(tableLoader)
+//                .equalityFieldColumns(Arrays.asList("id"))
+//                .writeParallelism(1)
+//                .build();
         env.execute();
     }
 }

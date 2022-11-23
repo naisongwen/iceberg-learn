@@ -75,7 +75,7 @@ public class DataRowSinkExampleV5 extends ExampleBase {
 
 
         StreamTableEnvironment tEnv = StreamTableEnvironment.create(env);
-        tEnv.createTemporaryView("tbl",dataStream,"id,data");
+//        tEnv.createTemporaryView("tbl",dataStream,"id,data");
         org.apache.flink.table.api.Table table=tEnv.sqlQuery("select id,count(*) from tbl group by id");
         DataStream<Tuple2<Boolean, Row>> retractStreamTable = tEnv.toRetractStream(table, Row.class);
         retractStreamTable.print();

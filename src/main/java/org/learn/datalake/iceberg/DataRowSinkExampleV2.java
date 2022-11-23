@@ -99,12 +99,12 @@ public class DataRowSinkExampleV2 extends ExampleBase {
         // Shuffle by the equality key, so that different operations of the same key could be wrote in order when
         // executing tasks in parallel.
         dataStream = dataStream.keyBy(row -> row.getField(0));
-        FlinkSink.forRow(dataStream, SimpleDataUtil.FLINK_SCHEMA)
-                .tableLoader(tableLoader)
-                .tableSchema(SimpleDataUtil.FLINK_SCHEMA)
-                .writeParallelism(1)
-                .equalityFieldColumns(ImmutableList.of("id"))//Arrays.asList("id"))
-                .build();
+//        FlinkSink.forRow(dataStream, SimpleDataUtil.FLINK_SCHEMA)
+//                .tableLoader(tableLoader)
+//                .tableSchema(SimpleDataUtil.FLINK_SCHEMA)
+//                .writeParallelism(1)
+//                .equalityFieldColumns(ImmutableList.of("id"))//Arrays.asList("id"))
+//                .build();
         env.execute();
         table.refresh();
 

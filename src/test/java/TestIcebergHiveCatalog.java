@@ -30,6 +30,8 @@ import java.util.Map;
 
 public class TestIcebergHiveCatalog {
     String hmsUri="thrift://10.201.0.212:39083";
+//    String hmsUri="thrift://10.201.0.202:30470";
+
     @Test
     public void testCreateHiveMappingTable() {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
@@ -144,6 +146,7 @@ public class TestIcebergHiveCatalog {
 
         catalogLoader = CatalogLoader.hive("iceberg_default", cfg, properties);
         TableIdentifier dataIdentifier = TableIdentifier.of("default", "iceberg_test_s3_table2");
+        catalogLoader.loadCatalog().loadTable(dataIdentifier);
         catalogLoader.loadCatalog().dropTable(dataIdentifier);
         catalogLoader.loadCatalog().createTable(dataIdentifier, SimpleDataUtil.SCHEMA);
     }
@@ -157,12 +160,22 @@ public class TestIcebergHiveCatalog {
                 .of(TableProperties.FORMAT_VERSION, "1")
                 .of("catalog-type", "hive")
 //                .of("warehouse", warehouse)
-                .of("hive-conf-dir", "/data5/flink/hive/conf/")
                 .of("uri", hmsUri);
 
-        Configuration cfg = new Configuration();
-        catalogLoader = CatalogLoader.hive("iceberg_default", cfg, properties);
-        TableIdentifier dataIdentifier = TableIdentifier.of("test_database", "test_trino_iceberg_table");
+        HiveConf hiveConf=new HiveConf();
+        hiveConf.set("hive.metastore.warehouse.dir", "s3a://bucket/minio_217/");
+        hiveConf.set("metastore.catalog.default", "minio_217");
+        hiveConf.set("hive.metastore.client.capability.check", "false");
+        hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
+        hiveConf.set("hive.metastore.uris", hmsUri);
+        hiveConf.set("metastore.catalog.default", "hive");
+        hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
+        hiveConf.set("fs.s3a.access.key", "deepexi2022");
+        hiveConf.set("fs.s3a.secret.key", "deepexi2022");
+        hiveConf.set("fs.s3a.endpoint", "http://10.201.0.212:32000");
+
+        catalogLoader = CatalogLoader.hive("iceberg_default", hiveConf, properties);
+        TableIdentifier dataIdentifier = TableIdentifier.of("cee_hzj", "abcd");
         Table table=catalogLoader.loadCatalog().loadTable(dataIdentifier);
         CloseableIterable<Record> iterable = IcebergGenerics.read(table)
 //                .where(Expressions.equal("col_value","xxxxx"))

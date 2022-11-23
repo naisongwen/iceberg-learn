@@ -34,7 +34,7 @@ public class OverwriteFileExample extends TableTestBase {
 
         Snapshot committedSnapshot = table.currentSnapshot();
         long snapshotId = committedSnapshot.snapshotId();
-        List<ManifestFile> manifestFiles=committedSnapshot.allManifests();
+        List<ManifestFile> manifestFiles=committedSnapshot.allManifests(table.io());
         for(ManifestFile m:manifestFiles) {
             System.out.println(m.path()+" owns datafiles as below:");
             ManifestReader<DataFile> reader = ManifestFiles.read(m, new TestTables.LocalFileIO());

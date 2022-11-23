@@ -74,11 +74,11 @@ public class DataRowSinkExampleV1 {
 
         try {
             TableLoader tableLoader = TableLoader.fromHadoopTable(tablePath);
-            FlinkSink.forRowData(dataStream)
-                    .table(table)
-                    .tableLoader(tableLoader)
-                    .writeParallelism(1)
-                    .build();
+//            FlinkSink.forRowData(dataStream)
+//                    .table(table)
+//                    .tableLoader(tableLoader)
+//                    .writeParallelism(1)
+//                    .build();
             env.execute("Test Iceberg DataStream");
         }catch (Exception e){
             e.printStackTrace();

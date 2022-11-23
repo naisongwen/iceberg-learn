@@ -43,7 +43,7 @@ public class FileReWriteExampleV3 extends TableTestBase {
 
 //        printTableData(table);
         Snapshot snapshotAfterDeletes = table.currentSnapshot();
-        Assert.assertEquals("Should create 2 manifests for initial write", 2, snapshotAfterDeletes.allManifests().size());
+        Assert.assertEquals("Should create 2 manifests for initial write", 2, snapshotAfterDeletes.allManifests(table.io()).size());
         //printManifest(baseSnap);
 
         Actions actions = Actions.forTable(table);
@@ -55,7 +55,7 @@ public class FileReWriteExampleV3 extends TableTestBase {
         CloseableIterable<FileScanTask> tasks = table.newScan().planFiles();
         List<DataFile> dataFiles = Lists.newArrayList(CloseableIterable.transform(tasks, FileScanTask::file));
         Snapshot snapshot = table.currentSnapshot();
-        printManifest(snapshot);
+        printManifest(snapshot, table.io());
         printTableData(table);
     }
 }

@@ -39,7 +39,7 @@ public class ManifestMergeExampleV2 extends TableTestBase {
                 .commit();
 
         Snapshot snapshot = table.currentSnapshot();
-        printManifest(snapshot);
+        printManifest(snapshot, table.io());
 
 //        File manifestFile=new File(new File(warehouse.getAbsolutePath() + "/metadata/"), "manifest-0.avro");
 //        ManifestFile manifest = writeManifest(null,table,manifestFile,dataFileA, dataFileB);
@@ -51,7 +51,7 @@ public class ManifestMergeExampleV2 extends TableTestBase {
         String data = Iterables.toString(iterable);
         System.out.println(data);
         snapshot = table.currentSnapshot();
-        printManifest(snapshot);
+        printManifest(snapshot, table.io());
     }
 
     static List<GenericRecord> mockInsertData() {

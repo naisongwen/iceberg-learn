@@ -36,10 +36,7 @@ import org.apache.iceberg.data.parquet.GenericParquetWriter;
 import org.apache.iceberg.deletes.EqualityDeleteWriter;
 import org.apache.iceberg.deletes.PositionDeleteWriter;
 import org.apache.iceberg.flink.CatalogLoader;
-import org.apache.iceberg.io.CloseableIterable;
-import org.apache.iceberg.io.CloseableIterator;
-import org.apache.iceberg.io.FileAppender;
-import org.apache.iceberg.io.OutputFile;
+import org.apache.iceberg.io.*;
 import org.apache.iceberg.parquet.Parquet;
 import org.apache.iceberg.types.Types;
 import org.junit.Assert;
@@ -165,8 +162,8 @@ public class TableTestBase {
         System.out.println(data);
     }
 
-    protected static void printManifest(Snapshot snapshot) {
-        List<ManifestFile> manifestFiles = snapshot.allManifests();
+    protected static void printManifest(Snapshot snapshot, FileIO fileIo) {
+        List<ManifestFile> manifestFiles = snapshot.allManifests(fileIo);
         for (ManifestFile m : manifestFiles) {
             System.out.println(m.path() + " owns datafiles as belows:");
             if (m.content() == ManifestContent.DATA) {

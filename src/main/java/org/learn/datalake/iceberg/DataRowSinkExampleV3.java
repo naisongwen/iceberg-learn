@@ -89,12 +89,12 @@ public class DataRowSinkExampleV3 extends ExampleBase {
         operations.commit(metadata, metadata.upgradeToFormatVersion(2));
 
         TableLoader tableLoader = TableLoader.fromHadoopTable(warehouse.getAbsolutePath());
-        FlinkSink.forRowData(dataStream)
-                .table(table)
-                .tableLoader(tableLoader)
-                .equalityFieldColumns(Arrays.asList("id"))
-                .writeParallelism(1)
-                .build();
+//        FlinkSink.forRowData(dataStream)
+//                .table(table)
+//                .tableLoader(tableLoader)
+//                .equalityFieldColumns(Arrays.asList("id"))
+//                .writeParallelism(1)
+//                .build();
 
 
         env.execute("Test Iceberg DataStream");

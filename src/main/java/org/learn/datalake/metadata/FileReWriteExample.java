@@ -65,7 +65,7 @@ public class FileReWriteExample extends TableTestBase {
         CloseableIterable<FileScanTask> tasks = table.newScan().planFiles();
         List<DataFile> dataFiles = Lists.newArrayList(CloseableIterable.transform(tasks, FileScanTask::file));
         Snapshot snapshot = table.currentSnapshot();
-        printManifest(snapshot);
+        printManifest(snapshot, table.io());
         printTableData(table);
     }
 }

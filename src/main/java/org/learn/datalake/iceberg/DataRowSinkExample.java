@@ -128,11 +128,11 @@ public class DataRowSinkExample extends ExampleBase {
 
         TableLoader tableLoader = TableLoader.fromCatalog(catalogLoader, tableIdentifier);
         dataStream = dataStream.keyBy((KeySelector) value -> ((RowData) value).getInt(0));
-        FlinkSink.forRowData(dataStream)
-                .table(table)
-                .tableLoader(tableLoader)
-                .equalityFieldColumns(ImmutableList.of("id"))//Arrays.asList("id"))
-                .build();
+//        FlinkSink.forRow(dataStream)
+//                .table(table)
+//                .tableLoader(tableLoader)
+//                .equalityFieldColumns(ImmutableList.of("id"))//Arrays.asList("id"))
+//                .build();
 
         env.execute();
 
