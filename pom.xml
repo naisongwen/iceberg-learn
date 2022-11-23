@@ -57,7 +57,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.flisnk</groupId>
+            <groupId>org.apache.flink</groupId>
             <artifactId>flink-table-runtime_${scala.binary.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>

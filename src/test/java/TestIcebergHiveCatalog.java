@@ -156,8 +156,7 @@ public class TestIcebergHiveCatalog {
                 .of("type", "iceberg")
                 .of(TableProperties.FORMAT_VERSION, "1")
                 .of("catalog-type", "hive")
-//                .of("warehouse", warehouse)
-                .of("hive-conf-dir", "/data5/flink/hive/conf/")
+                .of("warehouse", "s3a://faas-ethan/warehouse")
                 .of("uri", hmsUri);
 
         Configuration cfg = new Configuration();

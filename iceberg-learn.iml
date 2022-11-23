@@ -46,8 +46,8 @@
     <orderEntry type="library" name="Maven: org.apache.flink:flink-table-runtime_2.11:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-table-code-splitter:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.janino:janino:3.0.11" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:3.0.11" level="project" />
     <orderEntry type="library" name="Maven: org.apache.calcite.avatica:avatica-core:1.17.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.flisnk:flink-table-runtime_2.11:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-table-common:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-connector-files:1.14.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.flink:flink-shaded-asm-7:7.1-14.0" level="project" />
@@ -371,7 +371,6 @@
     <orderEntry type="library" name="Maven: com.esri.geometry:esri-geometry-api:2.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.yahoo.datasketches:sketches-core:0.9.0" level="project" />
     <orderEntry type="library" name="Maven: com.yahoo.datasketches:memory:0.9.0" level="project" />
-    <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:2.7.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.calcite:calcite-druid:1.16.0" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.calcite.avatica:avatica:1.11.0" level="project" />
