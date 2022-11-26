@@ -21,6 +21,7 @@ import org.apache.iceberg.flink.CatalogLoader;
 import org.apache.iceberg.flink.FlinkCatalog;
 import org.apache.iceberg.io.CloseableIterable;
 import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
+import org.junit.Before;
 import org.junit.Test;
 import org.learn.datalake.common.SimpleDataUtil;
 
@@ -29,8 +30,23 @@ import java.util.Locale;
 import java.util.Map;
 
 public class TestIcebergHiveCatalog {
-    String hmsUri="thrift://10.201.0.212:39083";
-//    String hmsUri="thrift://10.201.0.202:30470";
+//    String hmsUri="thrift://10.201.0.212:39083";
+    String hmsUri="thrift://10.201.0.202:30470";
+    HiveConf hiveConf;
+
+    @Before
+    public void init(){
+        hiveConf=new HiveConf();
+        hiveConf.set("hive.metastore.warehouse.dir", "s3a://bucket/minio_217/");
+        hiveConf.set("metastore.catalog.default", "minio_217");
+        hiveConf.set("hive.metastore.client.capability.check", "false");
+        hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
+        hiveConf.set("hive.metastore.uris", hmsUri);
+        hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
+        hiveConf.set("fs.s3a.access.key", "deepexi2022");
+        hiveConf.set("fs.s3a.secret.key", "deepexi2022");
+        hiveConf.set("fs.s3a.endpoint", "http://10.201.0.202:30977");
+    }
 
     @Test
     public void testCreateHiveMappingTable() {
@@ -161,18 +177,6 @@ public class TestIcebergHiveCatalog {
                 .of("catalog-type", "hive")
 //                .of("warehouse", warehouse)
                 .of("uri", hmsUri);
-
-        HiveConf hiveConf=new HiveConf();
-        hiveConf.set("hive.metastore.warehouse.dir", "s3a://bucket/minio_217/");
-        hiveConf.set("metastore.catalog.default", "minio_217");
-        hiveConf.set("hive.metastore.client.capability.check", "false");
-        hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
-        hiveConf.set("hive.metastore.uris", hmsUri);
-        hiveConf.set("metastore.catalog.default", "hive");
-        hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
-        hiveConf.set("fs.s3a.access.key", "deepexi2022");
-        hiveConf.set("fs.s3a.secret.key", "deepexi2022");
-        hiveConf.set("fs.s3a.endpoint", "http://10.201.0.212:32000");
 
         catalogLoader = CatalogLoader.hive("iceberg_default", hiveConf, properties);
         TableIdentifier dataIdentifier = TableIdentifier.of("cee_hzj", "abcd");

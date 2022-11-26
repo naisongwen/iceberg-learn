@@ -69,7 +69,7 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.apache.flink:flink-streaming-java:tests:1.16.0" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.ververica:flink-connector-mysql-cdc:1.1.1" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba.ververica:flink-connector-postgres-cdc:1.3.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.iceberg:iceberg-flink-1.14:1.0.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.iceberg:iceberg-flink-runtime-1.15:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.iceberg:iceberg-api:1.0.0" level="project" />
     <orderEntry type="library" name="Maven: com.github.stephenc.findbugs:findbugs-annotations:1.3.9-1" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: org.apache.iceberg:iceberg-bundled-guava:1.0.0" level="project" />
