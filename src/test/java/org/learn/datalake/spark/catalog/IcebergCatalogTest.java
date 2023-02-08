@@ -1,7 +1,13 @@
 package org.learn.datalake.spark.catalog;
 
+import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.GetTableRequest;
+import org.apache.hadoop.hive.metastore.api.GetTableResult;
+import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
@@ -33,11 +39,29 @@ public class IcebergCatalogTest {
             required(2, "data", Types.StringType.get())
     );
 
+
+    @SneakyThrows
+    @Test
+    public void testHiveCatalog() throws MetaException {
+        String catalogName = "linkhouse_927";
+//        String thriftUri = "thrift://10.201.0.212:39083";
+        String thriftUri = "thrift://10.201.0.84:9083";
+        HiveConf hiveConf = new HiveConf();
+//        hiveConf.set("metastore.catalog.default", catalogName);
+//        hiveConf.set("metastore.client.capability.check","false");
+        hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, thriftUri);
+        HiveMetaStoreClient hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
+        hiveMetaStoreClient.getAllDatabases().forEach(System.out::println);
+
+        org.apache.hadoop.hive.metastore.api.Table table = hiveMetaStoreClient.getTable("hive","hexf07","hive_test05");
+        System.out.println(table);
+    }
+
     @Test
     public void testIcebergHiveCatalog() {
         Configuration conf = new Configuration();
-        String catalogName = "default";
-        String thriftUri = "thrift://localhost:9083";
+        String catalogName = "linkhouse_927";
+        String thriftUri = "thrift://10.201.0.212:39083";
 //        File warehouse = new File("warehouse");
 //        try {
 //            if (warehouse.exists())

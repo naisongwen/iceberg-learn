@@ -13,7 +13,7 @@ public class TestSparkHive {
         SparkSession spark = SparkSession.builder().
                 appName(TestSparkHive.class.getSimpleName()).
                 master("local[*]").
-                config(HiveConf.ConfVars.METASTOREURIS.varname,"thrift://10.201.0.202:49157").
+                config(HiveConf.ConfVars.METASTOREURIS.varname,"thrift://10.201.0.212:39083").
                 enableHiveSupport().
                 getOrCreate();
 
@@ -21,6 +21,6 @@ public class TestSparkHive {
         spark.sessionState().catalogManager().v1SessionCatalog();
         spark.sessionState().catalogManager().v2SessionCatalog();
         List<Row> list= spark.sql("show databases").collectAsList();
-        System.out.println(catalog);
+        System.out.println(list);
     }
 }
