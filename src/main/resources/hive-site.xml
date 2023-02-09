@@ -29,7 +29,7 @@
 		<description>validates existing schema against code. turn this on if you want to verify existing schema</description>
 	</property>
 	<property>
-		<name>hive.metastore.client.capability.check</name>
+		<name>metastore.client.capability.check</name>
 		<value>false</value>
 	</property>
 
