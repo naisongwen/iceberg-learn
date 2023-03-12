@@ -47,6 +47,12 @@ public class TestSparkTable extends SparkCatalogTestBase {
         sql("DROP TABLE IF EXISTS %s", tableName);
     }
 
+
+    @Test
+    public void testSqlQuery(){
+        sql("select * from test_spark_tbl");
+    }
+
     @Test
     public void testTableEquality() throws NoSuchTableException {
         CatalogManager catalogManager = spark.sessionState().catalogManager();

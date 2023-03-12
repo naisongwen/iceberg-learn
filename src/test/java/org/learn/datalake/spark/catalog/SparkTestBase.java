@@ -55,13 +55,15 @@ public abstract class SparkTestBase {
     protected static SparkSession spark = null;
     protected static HiveCatalog catalog = null;
 
+    protected final static String hmsUri="thrift://10.201.0.212:39803";
+
+
     @BeforeClass
     public static void startSpark() {
         hiveConf=new HiveConf();
-        String hmsUri="thrift://10.201.0.212:49166";
         hiveConf.set(METASTOREURIS.varname, hmsUri);
 
-//        hiveConf.set("metastore.catalog.default", "default_catalog_5");
+//        hiveConf.set("metastore.catalog.default", "hzj_hdfs_dev_8");
         SparkTestBase.spark = SparkSession.builder()
                 .master("local[2]")
                 .config(SQLConf.PARTITION_OVERWRITE_MODE().key(), "dynamic")

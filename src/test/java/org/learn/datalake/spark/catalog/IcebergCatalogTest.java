@@ -22,6 +22,7 @@ import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
 import org.apache.iceberg.types.Types;
+import org.apache.thrift.TException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,9 +41,8 @@ public class IcebergCatalogTest {
     );
 
 
-    @SneakyThrows
     @Test
-    public void testHiveCatalog() throws MetaException {
+    public void testHiveCatalog() throws TException {
         String catalogName = "linkhouse_927";
 //        String thriftUri = "thrift://10.201.0.212:39083";
         String thriftUri = "thrift://10.201.0.84:9083";
@@ -52,9 +52,6 @@ public class IcebergCatalogTest {
         hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, thriftUri);
         HiveMetaStoreClient hiveMetaStoreClient = new HiveMetaStoreClient(hiveConf);
         hiveMetaStoreClient.getAllDatabases().forEach(System.out::println);
-
-        org.apache.hadoop.hive.metastore.api.Table table = hiveMetaStoreClient.getTable("hive","hexf07","hive_test05");
-        System.out.println(table);
     }
 
     @Test

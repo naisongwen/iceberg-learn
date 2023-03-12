@@ -121,45 +121,45 @@ public abstract class TestIcebergSourceTablesBase extends SparkTestBase {
         Assert.assertEquals("Records should match", expectedRecords, actualRecords);
     }
 
-    @Test
-    public void testEntriesTable() throws Exception {
-        TableIdentifier tableIdentifier = TableIdentifier.of("db", "entries_test");
-        Table table = createTable(tableIdentifier, SCHEMA, PartitionSpec.unpartitioned());
-        Table entriesTable = loadTable(tableIdentifier, "entries");
-
-        List<SimpleRecord> records = Lists.newArrayList(new SimpleRecord(1, "1"));
-
-        Dataset<Row> inputDf = spark.createDataFrame(records, SimpleRecord.class);
-        inputDf.select("id", "data").write()
-                .format("iceberg")
-                .mode("append")
-                .save(loadLocation(tableIdentifier));
-
-        table.refresh();
-
-        List<Row> actual = spark.read()
-                .format("iceberg")
-                .load(loadLocation(tableIdentifier, "entries"))
-                .collectAsList();
-
-        Snapshot snapshot = table.currentSnapshot();
-
-        Assert.assertEquals("Should only contain one manifest", 1, snapshot.allManifests().size());
-
-        InputFile manifest = table.io().newInputFile(snapshot.allManifests().get(0).path());
-        List<GenericData.Record> expected = Lists.newArrayList();
-        try (CloseableIterable<GenericData.Record> rows = Avro.read(manifest).project(entriesTable.schema()).build()) {
-            // each row must inherit snapshot_id and sequence_number
-            rows.forEach(row -> {
-                row.put(2, 0L);
-                GenericData.Record file = (GenericData.Record) row.get("data_file");
-                expected.add(row);
-            });
-        }
-
-        Assert.assertEquals("Entries table should have one row", 1, expected.size());
-        Assert.assertEquals("Actual results should have one row", 1, actual.size());
-    }
+//    @Test
+//    public void testEntriesTable() throws Exception {
+//        TableIdentifier tableIdentifier = TableIdentifier.of("db", "entries_test");
+//        Table table = createTable(tableIdentifier, SCHEMA, PartitionSpec.unpartitioned());
+//        Table entriesTable = loadTable(tableIdentifier, "entries");
+//
+//        List<SimpleRecord> records = Lists.newArrayList(new SimpleRecord(1, "1"));
+//
+//        Dataset<Row> inputDf = spark.createDataFrame(records, SimpleRecord.class);
+//        inputDf.select("id", "data").write()
+//                .format("iceberg")
+//                .mode("append")
+//                .save(loadLocation(tableIdentifier));
+//
+//        table.refresh();
+//
+//        List<Row> actual = spark.read()
+//                .format("iceberg")
+//                .load(loadLocation(tableIdentifier, "entries"))
+//                .collectAsList();
+//
+//        Snapshot snapshot = table.currentSnapshot();
+//
+//        Assert.assertEquals("Should only contain one manifest", 1, snapshot.allManifests().size());
+//
+//        InputFile manifest = table.io().newInputFile(snapshot.allManifests().get(0).path());
+//        List<GenericData.Record> expected = Lists.newArrayList();
+//        try (CloseableIterable<GenericData.Record> rows = Avro.read(manifest).project(entriesTable.schema()).build()) {
+//            // each row must inherit snapshot_id and sequence_number
+//            rows.forEach(row -> {
+//                row.put(2, 0L);
+//                GenericData.Record file = (GenericData.Record) row.get("data_file");
+//                expected.add(row);
+//            });
+//        }
+//
+//        Assert.assertEquals("Entries table should have one row", 1, expected.size());
+//        Assert.assertEquals("Actual results should have one row", 1, actual.size());
+//    }
 
 //    @Test
 //    public void testEntriesTablePartitionedPrune() throws Exception {

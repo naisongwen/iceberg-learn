@@ -61,6 +61,11 @@
 	</property>
 
 	<property>
+		<name>fs.s3a.aws.credentials.provider</name>
+		<value>org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider</value>
+	</property>
+
+	<property>
 		<name>fs.s3a.access.key</name>
 		<value>admin1234</value>
 		<description>AWS access key ID.
