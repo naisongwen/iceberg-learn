@@ -15,44 +15,49 @@ import java.util.Map;
 
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTOREURIS;
 
-public class SparkSqlTest {
+public class SparkIcebergSqlTest {
+    String hmsUri = "thrift://10.201.0.212:39083";
+    String table="test_tbl_9";
 
     @Test
-    public void testInsert() {
-        String hmsUri = "thrift://localhost:9083";
+    public void testIcebergSqlQuery() {
         String warehouse = "s3a://faas-ethan/warehouse/";
-        SparkSession sparkSession = SparkSession.builder()
+        SparkSession.Builder builder= SparkSession.builder()
                 .master("local[2]")
                 .config(SQLConf.PARTITION_OVERWRITE_MODE().key(), "dynamic")
 //                .config("spark.hadoop." + METASTOREURIS.varname, hmsUri)
                 .config("spark.hadoop.hive.metastore.warehouse.dir", warehouse)
-                .config("spark.hadoop.fs.s3a.access.key", "admin1234")
-                .config("spark.hadoop.fs.s3a.secret.key", "admin1234")
+//                .config("spark.sql.catalog.test_hive_catalog.hadoop.fs.s3a.access.key", "admin1234")
+//                .config("spark.sql.catalog.test_hive_catalog.hadoop.fs.s3a.secret.key", "admin1234")
+//                .config("spark.sql.catalog.test_hive_catalog.hadoop.fs.s3a.endpoint", "http://10.201.0.212:32000")
+//                .config("spark.hadoop.fs.s3a.access.key", "admin1234")
+//                .config("spark.hadoop.fs.s3a.secret.key", "admin1234")
+//                .config("spark.hadoop.fs.s3a.endpoint", "http://10.201.0.212:32000")
+                .config("fs.s3a.impl.disable.cache", "true")
                 .config("spark.hadoop.fs.s3a.connection.ssl.enabled", "false")
-                .config("spark.hadoop.fs.s3a.endpoint", "http://10.201.0.212:32000")
                 .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
                 .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
 
                 .config("spark.hadoop.hive.metastore.schema.verification", "false")
-                .config("spark.sql.warehouse.dir", warehouse)
-                .enableHiveSupport()
-                .getOrCreate();
+                .config("spark.sql.warehouse.dir", warehouse);
 
-        HiveConf hiveConf = new HiveConf();
-        hiveConf.set("hive.metastore.warehouse.dir", warehouse);
-        HiveCatalog catalog = (HiveCatalog)
-                CatalogUtil.loadCatalog(HiveCatalog.class.getName(), "hive", ImmutableMap.of(), hiveConf);
+//        HiveConf hiveConf = new HiveConf();
+//        hiveConf.set("hive.metastore.warehouse.dir", warehouse);
+//        HiveCatalog catalog = (HiveCatalog)
+//                CatalogUtil.loadCatalog(HiveCatalog.class.getName(), "hive", ImmutableMap.of(), hiveConf);
         String catalogName = "test_hive_catalog";
-        String table="test_tbl_7";
-        sparkSession.conf().set("spark.sql.catalog." + catalogName, SparkCatalog.class.getName());
+        builder.config("spark.sql.catalog." + catalogName, SparkCatalog.class.getName());
         Map<String, String> config = ImmutableMap.of(
                 "type", "hive",
-                "uri", "thrift://10.201.0.202:49157",
+                "uri", hmsUri,
                 "warehouse", warehouse,
-                "default-namespace", "default"
+                "hadoop.fs.s3a.access.key", "admin1234",
+                "hadoop.fs.s3a.secret.key", "admin1234",
+                "hadoop.fs.s3a.endpoint", "http://10.201.0.212:32000"
         );
-        config.forEach((key, value) -> sparkSession.conf().set("spark.sql.catalog." + catalogName + "." + key, value));
-//        catalog.createNamespace(Namespace.of("default"));
+        config.forEach((key, value) -> builder.config("spark.sql.catalog." + catalogName + "." + key, value));
+        SparkSession sparkSession=builder.enableHiveSupport().getOrCreate();
+        //        catalog.createNamespace(Namespace.of("default"));
         String tableName = String.format("%s.default.%s", catalogName,table);
         String query =String.format("CREATE TABLE %s (id bigint NOT NULL, data string)\n" +
                 " USING iceberg\n" +
@@ -64,5 +69,6 @@ public class SparkSqlTest {
         query = String.format("select * from %s",tableName);
         List<Row> rows = sparkSession.sql(query).collectAsList();
         System.out.println(rows);
+        sparkSession.sql(String.format("drop table %s",tableName));
     }
 }
