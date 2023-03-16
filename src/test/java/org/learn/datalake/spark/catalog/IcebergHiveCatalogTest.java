@@ -2,6 +2,8 @@ package org.learn.datalake.spark.catalog;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.iceberg.CatalogUtil;
 import org.apache.iceberg.PartitionSpec;
 import org.apache.iceberg.Schema;
 import org.apache.iceberg.Table;
@@ -9,9 +11,11 @@ import org.apache.iceberg.catalog.Namespace;
 import org.apache.iceberg.catalog.TableIdentifier;
 import org.apache.iceberg.data.IcebergGenerics;
 import org.apache.iceberg.data.Record;
+import org.apache.iceberg.exceptions.AlreadyExistsException;
 import org.apache.iceberg.hadoop.HadoopCatalog;
 import org.apache.iceberg.hive.HiveCatalog;
 import org.apache.iceberg.io.CloseableIterable;
+import org.apache.iceberg.relocated.com.google.common.collect.ImmutableMap;
 import org.apache.iceberg.relocated.com.google.common.collect.Lists;
 import org.apache.iceberg.relocated.com.google.common.collect.Maps;
 import org.apache.iceberg.relocated.com.google.common.collect.Sets;
@@ -20,21 +24,52 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTOREURIS;
 import static org.apache.iceberg.types.Types.NestedField.required;
 
 //Reference TestHadoopCatalog
-public class IcebergCatalogTest {
+public class IcebergHiveCatalogTest extends SparkTestBase{
     final Schema schema = new Schema(
             required(1, "id", Types.IntegerType.get(), "unique ID"),
             required(2, "data", Types.StringType.get())
     );
 
     @Test
-    public void testIcebergHiveCatalog() {
+    public void testCreateNamespaces() {
+        hiveConf=new HiveConf();
+        hiveConf.set(METASTOREURIS.varname, hiveMetastoreURI);
+        HiveCatalog catalog = (HiveCatalog)
+                CatalogUtil.loadCatalog(HiveCatalog.class.getName(), "hive", ImmutableMap.of(), hiveConf);
+
+        try {
+            catalog.createNamespace(Namespace.of("default"));
+        } catch (
+                AlreadyExistsException ignored) {
+            // the default namespace already exists. ignore the create error
+        }
+    }
+
+    @Test
+    public void testListNamespaces() {
+        Map<String, String> properties = new HashMap<>();
+        properties.put("uri", hiveMetastoreURI);
+        Configuration conf = new Configuration();
+//        metastore.catalog.default available since HMS 3.x
+        conf.set("metastore.catalog.default", defaultCatalogName);
+        HiveCatalog catalog = new HiveCatalog();
+        catalog.setConf(conf);
+        catalog.initialize(defaultCatalogName, properties);
+        System.out.println("==========> list iceberg catalog databases");
+        catalog.listNamespaces().forEach(System.out::println);
+    }
+
+    @Test
+    public void testIcebergRead() {
         Configuration conf = new Configuration();
         String catalogName = "default";
         String thriftUri = "thrift://localhost:9083";
