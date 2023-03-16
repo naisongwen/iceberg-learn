@@ -55,19 +55,22 @@ public abstract class SparkTestBase {
     protected static SparkSession spark = null;
     protected static HiveCatalog catalog = null;
 
-    protected final static String hmsUri="thrift://10.201.0.212:39803";
+    protected static String hiveMetastoreURI="thrift://10.201.0.212:39083";
+    protected static String warehouse = "s3a://faas-ethan/warehouse/";
+    protected static String defaultCatalogName = "hzj_hdfs_dev_8_1974";
+    protected static String hmsUri = "thrift://10.201.0.212:39083";
+    protected static String table="test_tbl_11";
 
 
-    @BeforeClass
+//    @BeforeClass
     public static void startSpark() {
         hiveConf=new HiveConf();
-        hiveConf.set(METASTOREURIS.varname, hmsUri);
-
-//        hiveConf.set("metastore.catalog.default", "hzj_hdfs_dev_8");
+        hiveConf.set("metastore.catalog.default", defaultCatalogName);
+        hiveConf.set(METASTOREURIS.varname, hiveMetastoreURI);
         SparkTestBase.spark = SparkSession.builder()
                 .master("local[2]")
                 .config(SQLConf.PARTITION_OVERWRITE_MODE().key(), "dynamic")
-                .config("spark.hadoop." + METASTOREURIS.varname, hmsUri)
+                .config("spark.hadoop." + METASTOREURIS.varname, hiveMetastoreURI)
                 .config("spark.hadoop.hive.metastore.warehouse.dir", "s3a://faas-ethan/")
                 .config("spark.sql.warehouse.dir", "s3a://faas-ethan/")
                 .enableHiveSupport()
@@ -83,7 +86,7 @@ public abstract class SparkTestBase {
         }
     }
 
-    @AfterClass
+//    @AfterClass
     public static void stopMetastoreAndSpark() throws Exception {
         SparkTestBase.catalog = null;
         spark.stop();
