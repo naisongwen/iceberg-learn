@@ -8,14 +8,14 @@ import org.junit.Before;
 public class BaseTest {
     protected HiveConf hiveConf;
     protected HiveMetaStoreClient hiveMetaStoreClient;
-//        String hmsUri = "thrift://10.201.0.212:39083";
-    protected String hmsUri = "thrift://10.201.0.202:30470";
+        String hmsUri = "thrift://10.201.0.212:39083";
+//    protected String hmsUri = "thrift://10.201.0.202:30470";
 //    String hmsUri = "thrift://localhost:9083";
 
     @Before
     public void init() throws MetaException {
         hiveConf = new HiveConf();
-//        hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "s3a://bucket/minio/");
+        hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "s3a://test/");
         hiveConf.set("hive.metastore.client.capability.check", "false");
         hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
         hiveConf.set(HiveConf.ConfVars.METASTOREURIS.varname, hmsUri);

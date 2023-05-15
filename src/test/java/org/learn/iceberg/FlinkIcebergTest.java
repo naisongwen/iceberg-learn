@@ -29,24 +29,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class FlinkIcebergTest {
-//    String hmsUri="thrift://10.201.0.212:39083";
-    String hmsUri="thrift://10.201.0.202:30470";
-    HiveConf hiveConf;
-
-    @Before
-    public void init(){
-        hiveConf=new HiveConf();
-        hiveConf.set("hive.metastore.warehouse.dir", "s3a://bucket/minio/");
-        hiveConf.set("metastore.catalog.default", "minio_217");
-        hiveConf.set("hive.metastore.client.capability.check", "false");
-        hiveConf.set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem");
-        hiveConf.set("hive.metastore.uris", hmsUri);
-        hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
-        hiveConf.set("fs.s3a.access.key", "deepexi2022");
-        hiveConf.set("fs.s3a.secret.key", "deepexi2022");
-        hiveConf.set("fs.s3a.endpoint", "http://10.201.0.202:30977");
-    }
+public class FlinkIcebergTest extends BaseTest{
 
     @Test
     public void testCreateHiveMappingTable() {
@@ -55,7 +38,7 @@ public class FlinkIcebergTest {
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
-        HiveConf hiveConf=new HiveConf();
+        HiveConf hiveConf = new HiveConf();
 
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("metastore.catalog.default", "hive");
@@ -65,18 +48,18 @@ public class FlinkIcebergTest {
         hiveConf.set("fs.s3a.connection.ssl.enabled", "false");
         hiveConf.set("fs.s3a.secret.key", "admin1234");
         hiveConf.set("fs.s3a.endpoint", "http://10.201.0.212:32000");
-        HiveCatalog hiveCatalog=new HiveCatalog("test_catalog_name","default",hiveConf, HiveShimLoader.getHiveVersion());
+        HiveCatalog hiveCatalog = new HiveCatalog("test_catalog_name", "default", hiveConf, HiveShimLoader.getHiveVersion());
         hiveCatalog.open();
-        tableEnvironment.registerCatalog(hiveCatalog.getName(),hiveCatalog);
+        tableEnvironment.registerCatalog(hiveCatalog.getName(), hiveCatalog);
         Map<String, String> map = new HashMap<>();
         map.put("test", "test");
-        String tblName="test_iceberg_table_1";
+        String tblName = "test_iceberg_table_1";
 //        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(map, "test");
 //        hiveCatalog.createDatabase( "test_database", catalogDatabase,true);
 //        tableEnvironment.useCatalog(hiveCatalog.getName());
 //        tableEnvironment.useDatabase("test_database");
-        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
-        String sql= String.format("CREATE TABLE %s(" +
+        tableEnvironment.executeSql(String.format("drop table if exists %s", tblName));
+        String sql = String.format("CREATE TABLE %s(" +
                 "     id INT,\n" +
                 "     data string,\n" +
                 "      primary key(id) not enforced\n" +
@@ -92,11 +75,47 @@ public class FlinkIcebergTest {
                 "                'catalog-database' = '%s',\n" +
                 "                'catalog-table' = '%s',\n" +
                 "                'warehouse'='%s'\n" +
-                              ")",tblName,hmsUri,hiveCatalog.getName(),"default",tblName,"s3a://test/hive_db/");
+                ")", tblName, hmsUri, hiveCatalog.getName(), "default", tblName, "s3a://test/hive_db/");
         tableEnvironment.executeSql(sql);
-        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
-        tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
+        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')", tblName));
+        tableEnvironment.executeSql(String.format("select * from %s", tblName)).print();
         hiveCatalog.close();
+    }
+
+    @Test
+    public void testCreateTableForPerformance() throws DatabaseAlreadyExistException {
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
+        env.setParallelism(1);
+        EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inBatchMode().build();
+        StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
+
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("test", "test");
+        String db="test_database_performance_3";
+//        hiveConf.set(HiveConf.ConfVars.METASTOREWAREHOUSE.varname, "/tmp/"+db);
+        CatalogLoader catalogLoader = CatalogLoader.hive("hive", hiveConf, properties);
+        FlinkCatalog flinkCatalog = new FlinkCatalog("test_catalog_name", db, Namespace.empty(), catalogLoader, false);
+        flinkCatalog.open();
+        tableEnvironment.registerCatalog(flinkCatalog.getName(), flinkCatalog);
+        tableEnvironment.useCatalog(flinkCatalog.getName());
+        CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(Maps.newHashMap(), db);
+        flinkCatalog.createDatabase(db, catalogDatabase, true);
+        tableEnvironment.useDatabase(db);
+        long start=System.currentTimeMillis();
+        for (int i = 1; i < 100; i++) {
+            String tblName = "test_iceberg_table_" + i;
+            String sql = String.format("CREATE TABLE %s(" +
+                    "     id BIGINT COMMENT 'unique id'," +
+                    "     data STRING" +
+                    "     ) ", tblName);
+            System.out.println("create table "+tblName);
+            tableEnvironment.executeSql(sql);
+        }
+        long end=System.currentTimeMillis();
+        System.out.println("100 created tables took "+(end-start)/1000);
+        //100 created tables took 584
+        flinkCatalog.close();
     }
 
     @Test
@@ -106,7 +125,7 @@ public class FlinkIcebergTest {
         EnvironmentSettings environmentSettings = EnvironmentSettings.newInstance().inStreamingMode()
                 .build();
         StreamTableEnvironment tableEnvironment = StreamTableEnvironment.create(env, environmentSettings);
-        HiveConf hiveConf=new HiveConf();
+        HiveConf hiveConf = new HiveConf();
         hiveConf.set("hive.metastore.uris", hmsUri);
         hiveConf.set("hive.metastore.warehouse.dir", "s3a://faas-ethan/");
         hiveConf.set("metastore.catalog.default", "hive");
@@ -119,25 +138,25 @@ public class FlinkIcebergTest {
 
         Map<String, String> properties = new HashMap<>();
         properties.put("test", "test");
-        CatalogLoader catalogLoader=CatalogLoader.hive("hive", hiveConf, properties);
-        FlinkCatalog flinkCatalog=new FlinkCatalog("test_catalog_name","test_db", Namespace.empty(),catalogLoader,false);
+        CatalogLoader catalogLoader = CatalogLoader.hive("hive", hiveConf, properties);
+        FlinkCatalog flinkCatalog = new FlinkCatalog("test_catalog_name", "test_db", Namespace.empty(), catalogLoader, false);
         flinkCatalog.open();
-        tableEnvironment.registerCatalog(flinkCatalog.getName(),flinkCatalog);
+        tableEnvironment.registerCatalog(flinkCatalog.getName(), flinkCatalog);
         tableEnvironment.useCatalog(flinkCatalog.getName());
-        String tblName="test_iceberg_table_2";
+        String tblName = "test_iceberg_table_2";
         CatalogDatabaseImpl catalogDatabase = new CatalogDatabaseImpl(Maps.newHashMap(), "test_database");
-        flinkCatalog.createDatabase( "test_database", catalogDatabase,true);
+        flinkCatalog.createDatabase("test_database", catalogDatabase, true);
         tableEnvironment.useDatabase("test_database");
-        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
-        String sql= String.format("CREATE TABLE %s(" +
+        tableEnvironment.executeSql(String.format("drop table if exists %s", tblName));
+        String sql = String.format("CREATE TABLE %s(" +
                 "     id BIGINT COMMENT 'unique id'," +
                 "     data STRING" +
                 "     ) WITH (" +
-                ")",tblName);
+                ")", tblName);
         tableEnvironment.executeSql(sql);
-        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')",tblName));
-        tableEnvironment.executeSql(String.format("select * from %s",tblName)).print();
-        tableEnvironment.executeSql(String.format("drop table if exists %s",tblName));
+        tableEnvironment.executeSql(String.format("insert into %s values(1,'a')", tblName));
+        tableEnvironment.executeSql(String.format("select * from %s", tblName)).print();
+        tableEnvironment.executeSql(String.format("drop table if exists %s", tblName));
         flinkCatalog.close();
     }
 
@@ -179,8 +198,8 @@ public class FlinkIcebergTest {
                 .of("uri", hmsUri);
 
         catalogLoader = CatalogLoader.hive("iceberg_default", hiveConf, properties);
-        TableIdentifier dataIdentifier = TableIdentifier.of("cee_hzj", "abcd");
-        Table table=catalogLoader.loadCatalog().loadTable(dataIdentifier);
+        TableIdentifier dataIdentifier = TableIdentifier.of("test_database_performance_3", "test_iceberg_table_1");
+        Table table = catalogLoader.loadCatalog().loadTable(dataIdentifier);
         CloseableIterable<Record> iterable = IcebergGenerics.read(table)
 //                .where(Expressions.equal("col_value","xxxxx"))
                 .build();
